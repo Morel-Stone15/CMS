@@ -1595,17 +1595,133 @@ tbody tr:hover { background: var(--bg-glass-hover); }
 }
 
 /* ═══════════════════════════════════════
-   RESPONSIVE
+   RESPONSIVE — MOBILE / TABLET / PC
 ═══════════════════════════════════════ */
+
+/* ── Tablette (768px – 1024px) ── */
+@media (max-width: 1024px) {
+  :root { --sidebar-width: 220px; }
+  .main-content { margin-left: var(--sidebar-width); }
+  .stats-grid { grid-template-columns: repeat(2, 1fr); }
+  .page-header { flex-wrap: wrap; gap: 12px; }
+  .member-table th, .member-table td { font-size: 12px; padding: 10px 10px; }
+}
+
+/* ── Mobile (< 768px) ── */
 @media (max-width: 768px) {
   :root { --sidebar-width: 0px; }
-  .sidebar { transform: translateX(-260px); width: 260px; }
-  .sidebar.open { transform: translateX(0); }
+
+  /* Sidebar masquée par défaut sur mobile */
+  .sidebar {
+    transform: translateX(-260px);
+    width: 260px;
+    transition: transform 0.3s ease;
+    z-index: 200;
+  }
+  .sidebar.open { transform: translateX(0); box-shadow: 4px 0 30px rgba(0,0,0,0.5); }
+
+  /* Overlay sombre quand le menu est ouvert */
+  .sidebar-overlay {
+    display: none;
+    position: fixed; inset: 0; z-index: 199;
+    background: rgba(0,0,0,0.5);
+    backdrop-filter: blur(4px);
+  }
+  .sidebar-overlay.show { display: block; }
+
+  /* Bouton hamburger (visible seulement mobile) */
+  .mobile-menu-btn {
+    display: flex !important;
+    align-items: center; justify-content: center;
+    width: 40px; height: 40px;
+    background: var(--bg-glass);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    color: var(--text-primary);
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+
   .main-content { margin-left: 0; }
-  .page-body { padding: 16px; }
-  .page-header { padding: 16px 16px 0; }
+
+  /* Header adaptatif */
+  .page-header {
+    padding: 14px 14px 0;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: flex-start;
+  }
+  .page-title { font-size: 18px; }
+  .page-subtitle { font-size: 12px; }
+  .page-header > div:last-child { width: 100%; justify-content: flex-start; }
+
+  .page-body { padding: 12px 14px; }
+
+  /* Formulaires en colonne unique */
   .form-grid-2, .form-grid-3 { grid-template-columns: 1fr; }
-  .member-card { width: 320px; height: 200px; }
-  .stats-grid { grid-template-columns: repeat(2, 1fr); }
-  .auth-card { padding: 24px; }
+
+  /* Carte virtuelle adaptée */
+  .member-card { width: 100% !important; max-width: 340px; height: auto; }
+  .member-card-container { overflow: visible; padding: 8px; }
+
+  /* Stats en 2 colonnes */
+  .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .stat-card { padding: 14px 12px; }
+  .stat-value { font-size: 22px; }
+
+  /* Table scrollable horizontalement */
+  .table-container { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .member-table { min-width: 600px; }
+
+  /* Cartes en pleine largeur */
+  .card { padding: 14px; }
+  .card-body { padding: 14px; }
+
+  /* Auth adapté */
+  .auth-card { padding: 20px 16px; border-radius: 16px; }
+
+  /* Modal adapté */
+  .modal-dialog { width: calc(100vw - 24px); max-width: 100%; max-height: 90vh; overflow-y: auto; }
+  .modal-body { padding: 16px; }
+
+  /* Boutons pleine largeur dans les actions mobiles */
+  .btn-group-mobile { flex-direction: column !important; width: 100%; }
+  .btn-group-mobile .btn { justify-content: center; width: 100%; }
+
+  /* Chat en plein écran */
+  .chat-container { height: 400px; }
+
+  /* Tableau de bord org */
+  .org-node { padding: 10px 12px; }
+
+  /* Navigation tablette */
+  .sidebar-nav { gap: 2px; }
+  .nav-item { padding: 10px 12px; font-size: 13px; }
+  .nav-item span { font-size: 13px; }
 }
+
+/* ── Très petit mobile (< 480px) ── */
+@media (max-width: 480px) {
+  .stats-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
+  .stat-value { font-size: 18px; }
+  .page-title { font-size: 16px; }
+  .auth-tabs-3 .auth-tab { font-size: 12px; padding: 8px 4px; }
+  .member-card { max-width: 300px; }
+}
+
+/* ── PC large (> 1400px) ── */
+@media (min-width: 1400px) {
+  .stats-grid { grid-template-columns: repeat(4, 1fr); }
+  .form-grid-2 { grid-template-columns: repeat(2, 1fr); }
+  .form-grid-3 { grid-template-columns: repeat(3, 1fr); }
+}
+
+/* ── PWA / plein écran ── */
+@media (display-mode: standalone) {
+  /* Ajouter de l'espace pour la barre de statut iOS */
+  .sidebar { padding-top: env(safe-area-inset-top); }
+  .main-content { padding-bottom: env(safe-area-inset-bottom); }
+}
+
+/* Cacher le bouton hamburger sur desktop */
+.mobile-menu-btn { display: none; }

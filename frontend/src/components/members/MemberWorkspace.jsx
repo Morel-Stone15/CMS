@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { CreditCard, Settings, Activity, MessageSquare, Network, Download, FileText, Mail, LogOut } from 'lucide-react';
+import { CreditCard, Settings, Activity, MessageSquare, Network, Download, FileText, Mail, LogOut, Menu, X } from 'lucide-react';
 import { toPng } from 'html-to-image';
 import { api } from '../../services/api';
 import { fmt } from '../../constants/data';
@@ -9,6 +9,7 @@ import { DiscussionView } from '../discussion/DiscussionView';
 
 export function MemberWorkspace({ member, onLogout, showToast }) {
   const [page, setPage] = useState('card');
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [attendance, setAttendance] = useState([]);
   const [orgChart, setOrgChart] = useState([]);
   const [editForm, setEditForm] = useState({ email: member.email, phone: member.phone });
@@ -123,9 +124,12 @@ export function MemberWorkspace({ member, onLogout, showToast }) {
     { id: 'orgchart', icon: <Network size={18} />, label: 'Organigramme' },
   ];
 
+  function closeSidebar() { setSidebarOpen(false); }
+
   return (
     <div className="app-shell">
-      <aside className="sidebar">
+      <div className={`sidebar-overlay ${sidebarOpen ? 'show' : ''}`} onClick={closeSidebar} />
+      <aside className={`sidebar ${sidebarOpen ? 'open' : ''}`}>
         <div className="sidebar-logo">
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 4 }}>
             <img src="/logo.png" alt="Logo" style={{ height: 34, width: 'auto', filter: 'drop-shadow(0 0 8px rgba(0,212,255,0.5))' }} />
@@ -137,7 +141,7 @@ export function MemberWorkspace({ member, onLogout, showToast }) {
         </div>
         <nav className="sidebar-nav">
           {navItems.map(item => (
-            <div key={item.id} className={`nav-item ${page === item.id ? 'active' : ''}`} onClick={() => setPage(item.id)}>
+            <div key={item.id} className={`nav-item ${page === item.id ? 'active' : ''}`} onClick={() => { setPage(item.id); closeSidebar(); }}>
               {item.icon}<span>{item.label}</span>
             </div>
           ))}
@@ -162,9 +166,14 @@ export function MemberWorkspace({ member, onLogout, showToast }) {
         {page === 'card' && (
           <>
             <div className="page-header">
-              <div>
-                <h1 className="page-title">Ma Carte Virtuelle</h1>
-                <p className="page-subtitle">Votre identifiant officiel au C-TECH — survolez la carte pour l'effet 3D !</p>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                <button className="mobile-menu-btn" onClick={() => setSidebarOpen(o => !o)}>
+                  {sidebarOpen ? <X size={20} /> : <Menu size={20} />}
+                </button>
+                <div>
+                  <h1 className="page-title">Ma Carte Virtuelle</h1>
+                  <p className="page-subtitle">Votre identifiant officiel au C-TECH — survolez la carte pour l'effet 3D !</p>
+                </div>
               </div>
               <div className="flex gap-2">
                 <button className="btn btn-secondary" onClick={downloadCard} title="Télécharger en PNG">
