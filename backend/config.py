@@ -22,6 +22,10 @@ class Config:
     UPLOAD_FOLDER = os.path.join(BASE_DIR, 'uploads')
     PHOTO_FOLDER = os.path.join(UPLOAD_FOLDER, 'photos')
     QR_FOLDER = os.path.join(UPLOAD_FOLDER, 'qrcodes')
+
+    # Public URLs (used in emails)
+    BACKEND_URL = os.environ.get('BACKEND_URL', 'http://localhost:5000')
+    FRONTEND_URL = os.environ.get('FRONTEND_URL', 'http://localhost:3000')
     
     # SMTP Configuration
     SMTP_SERVER = os.environ.get('SMTP_SERVER', 'smtp-mail.outlook.com')
@@ -38,4 +42,3 @@ class Config:
 
     # MOCK_EMAIL is False if SMTP_USER or EMAILJS_SERVICE_ID is set and MOCK_EMAIL is not explicitly true
     MOCK_EMAIL = (os.environ.get('MOCK_EMAIL', 'false').lower() == 'true') if (os.environ.get('SMTP_USER') or os.environ.get('EMAILJS_SERVICE_ID')) else (os.environ.get('MOCK_EMAIL', 'true').lower() == 'true')
-

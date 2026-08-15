@@ -1,0 +1,38 @@
+services:
+  # ─────────── BACKEND (Flask) ───────────
+  - type: web
+    name: ctech-backend
+    runtime: python
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:app --workers 2 --bind 0.0.0.0:$PORT
+    envVars:
+      - key: SECRET_KEY
+        generateValue: true
+      - key: MOCK_EMAIL
+        value: "false"
+      - key: BACKEND_URL
+        value: https://ctech-backend.onrender.com
+      - key: FRONTEND_URL
+        value: https://ctech-frontend.onrender.com
+      - key: EMAILJS_SERVICE_ID
+        sync: false
+      - key: EMAILJS_TEMPLATE_ID
+        sync: false
+      - key: EMAILJS_PUBLIC_KEY
+        sync: false
+    disk:
+      name: ctech-data
+      mountPath: /opt/render/project/src/backend/uploads
+      sizeGB: 1
+
+  # ─────────── FRONTEND (Vite/React) ───────────
+  - type: web
+    name: ctech-frontend
+    runtime: node
+    rootDir: frontend
+    buildCommand: npm install && npm run build
+    staticPublishPath: dist
+    envVars:
+      - key: VITE_API_URL
+        value: https://ctech-backend.onrender.com/api

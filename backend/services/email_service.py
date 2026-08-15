@@ -16,6 +16,10 @@ def _build_html_email(member, pin, greeting_override=None, action_label=None, ex
     greeting = greeting_override or f"Votre inscription à C-TECH a été validée avec succès !"
     action = action_label or "Votre carte virtuelle officielle a été générée et est disponible ci-dessous."
     note = extra_note or "Conservez précieusement vos identifiants pour vous connecter à votre Espace Membre."
+    
+    from flask import current_app
+    backend_url = current_app.config.get('BACKEND_URL', 'http://localhost:5000').rstrip('/')
+    frontend_url = current_app.config.get('FRONTEND_URL', 'http://localhost:3000').rstrip('/')
 
     show_pin_block = bool(pin)
 
@@ -28,7 +32,7 @@ def _build_html_email(member, pin, greeting_override=None, action_label=None, ex
         </div>
         """
 
-    pdf_download_url = f"http://localhost:5000/api/members/{member.id}/card_pdf"
+    pdf_download_url = f"{backend_url}/api/members/{member.id}/card_pdf"
     
     # Use PNG image if available, otherwise just use text
     card_visual = ""
@@ -49,7 +53,7 @@ def _build_html_email(member, pin, greeting_override=None, action_label=None, ex
         <!-- HEADER -->
         <tr>
           <td style="background:linear-gradient(135deg,#0f172a 0%,#1e3a5f 100%);padding:24px;text-align:center;">
-            <img src="http://localhost:5000/uploads/logo.png" alt="C-TECH Logo" style="height:60px;width:auto;margin-bottom:8px;display:inline-block;" />
+            <img src="{backend_url}/uploads/logo.png" alt="C-TECH Logo" style="height:60px;width:auto;margin-bottom:8px;display:inline-block;" />
             <div style="font-size:32px;font-weight:900;letter-spacing:4px;color:#00d4ff;font-family:'Segoe UI',sans-serif;">C-TECH</div>
             <div style="font-size:11px;letter-spacing:3px;color:#94a3b8;text-transform:uppercase;margin-top:4px;">CLUB TECHNOLOGIQUE ÉTUDIANT</div>
           </td>
@@ -83,14 +87,14 @@ def _build_html_email(member, pin, greeting_override=None, action_label=None, ex
               </tr>
               <tr>
                 <td align="center" style="padding-bottom:12px;">
-                  <a href="http://localhost:5000/api/members/{member.id}/card_png" style="display:inline-block;background:rgba(255,255,255,0.06);border:1px solid #1e3a5f;color:#00d4ff;text-decoration:none;padding:10px 24px;border-radius:10px;font-weight:600;font-size:13px;">
+                  <a href="{backend_url}/api/members/{member.id}/card_png" style="display:inline-block;background:rgba(255,255,255,0.06);border:1px solid #1e3a5f;color:#00d4ff;text-decoration:none;padding:10px 24px;border-radius:10px;font-weight:600;font-size:13px;">
                     🖼️ Voir la Carte en format Image (PNG)
                   </a>
                 </td>
               </tr>
               <tr>
                 <td align="center">
-                  <a href="http://localhost:3000" style="display:inline-block;background:rgba(255,255,255,0.06);border:1px solid #1e3a5f;color:#e2e8f0;text-decoration:none;padding:10px 24px;border-radius:10px;font-weight:600;font-size:13px;">
+                  <a href="{frontend_url}" style="display:inline-block;background:rgba(255,255,255,0.06);border:1px solid #1e3a5f;color:#e2e8f0;text-decoration:none;padding:10px 24px;border-radius:10px;font-weight:600;font-size:13px;">
                     💻 Se connecter à l'Espace Membre →
                   </a>
                 </td>
