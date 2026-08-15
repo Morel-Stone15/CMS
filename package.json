@@ -1,0 +1,11 @@
+{
+  "name": "club-tech-root",
+  "private": true,
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "cd frontend && npm run dev",
+    "dev:backend": "cd backend && python app.py",
+    "dev:frontend": "cd frontend && npm run dev",
+    "start": "powershell -ExecutionPolicy Bypass -File ./start.ps1"
+  }
+}
