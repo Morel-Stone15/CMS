@@ -36,6 +36,8 @@ export const api = {
   updateNotes: (id, notes, operator = 'Bureau') => apiFetch(`/members/${id}/private_notes`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ notes, operator }) }),
   updateStatus: (id, status, operator = 'Bureau') => apiFetch(`/members/${id}/status`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ status, operator }) }),
   sendCardEmail: (id, operator = 'Bureau') => apiFetch(`/members/${id}/send_card_email`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ operator }) }),
+  getCardPdfUrl: (id) => `${API_BASE}/members/${id}/card_pdf`,
+  getCardPngUrl: (id) => `${API_BASE}/members/${id}/card_png`,
 
   // Attendance
   getAttendance: (memberId = '') => apiFetch(`/attendance${memberId ? `?member_id=${memberId}` : ''}`),

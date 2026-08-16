@@ -22,38 +22,72 @@ export function MemberWorkspace({ member, onLogout, showToast }) {
   }, [member.id]);
 
   async function downloadCard() {
-    if (!cardRef.current) return;
+    showToast('Téléchargement de la carte PNG...', 'info');
     try {
-      const el = cardRef.current;
-      const prevTransform = el.style.transform;
-      el.style.transform = 'rotateX(0deg) rotateY(0deg) scale(1)';
-      el.style.transition = 'none';
-      await new Promise(r => setTimeout(r, 50));
-      const dataUrl = await toPng(el, { pixelRatio: 3 });
-      el.style.transform = prevTransform;
-      el.style.transition = '';
+      if (cardRef.current) {
+        const el = cardRef.current;
+        const prevTransform = el.style.transform;
+        el.style.transform = 'rotateX(0deg) rotateY(0deg) scale(1)';
+        el.style.transition = 'none';
+        await new Promise(r => setTimeout(r, 60));
+        const dataUrl = await toPng(el, { pixelRatio: 3, cacheBust: true });
+        el.style.transform = prevTransform;
+        el.style.transition = '';
+        
+        const a = document.createElement('a');
+        a.download = `Carte_C-TECH_${member.member_number}.png`;
+        a.href = dataUrl;
+        a.target = '_blank';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        showToast('Carte téléchargée en PNG !', 'success');
+        return;
+      }
+    } catch (e) {
+      console.warn('Canvas PNG fallback to API', e);
+    }
+
+    try {
+      const res = await fetch(api.getCardPngUrl(member.id));
+      if (!res.ok) throw new Error('Échec PNG');
+      const blob = await res.blob();
+      const blobUrl = URL.createObjectURL(blob);
       const a = document.createElement('a');
-      a.download = `carte-${member.member_number}.png`;
-      a.href = dataUrl;
+      a.download = `Carte_C-TECH_${member.member_number}.png`;
+      a.href = blobUrl;
+      a.target = '_blank';
+      document.body.appendChild(a);
       a.click();
+      document.body.removeChild(a);
+      setTimeout(() => URL.revokeObjectURL(blobUrl), 1000);
       showToast('Carte téléchargée en PNG !', 'success');
-    } catch { showToast('Impossible de télécharger la carte.', 'error'); }
+    } catch (err) {
+      window.open(api.getCardPngUrl(member.id), '_blank');
+      showToast('Téléchargement PNG lancé !', 'success');
+    }
   }
 
   async function downloadCardPDF() {
     try {
       showToast('Génération du PDF...', 'info');
-      const res = await fetch(`/api/members/${member.id}/card_pdf`);
+      const res = await fetch(api.getCardPdfUrl(member.id));
       if (!res.ok) { showToast('Erreur génération PDF.', 'error'); return; }
       const blob = await res.blob();
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.download = `Carte_CLUB_TECH_${member.member_number}.pdf`;
       a.href = url;
+      a.target = '_blank';
+      document.body.appendChild(a);
       a.click();
-      URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
       showToast('Carte PDF téléchargée !', 'success');
-    } catch { showToast('Erreur lors du téléchargement PDF.', 'error'); }
+    } catch {
+      window.open(api.getCardPdfUrl(member.id), '_blank');
+      showToast('Téléchargement PDF lancé !', 'success');
+    }
   }
 
   async function sendCardByEmail() {
