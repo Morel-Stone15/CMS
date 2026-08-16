@@ -1,4 +1,4 @@
-const CACHE_NAME = 'ctech-v1';
+const CACHE_NAME = 'ctech-v2';
 const STATIC_ASSETS = [
   '/',
   '/index.html',
@@ -26,28 +26,34 @@ self.addEventListener('activate', (event) => {
   self.clients.claim();
 });
 
-// Fetch: network-first for API, cache-first for static
+// Fetch: bypass SW completely for API calls, POST requests & cross-origin requests
 self.addEventListener('fetch', (event) => {
   const { request } = event;
   const url = new URL(request.url);
 
-  // Always go to network for API calls
-  if (url.pathname.startsWith('/api') || url.hostname !== self.location.hostname) {
-    event.respondWith(fetch(request).catch(() => new Response('Offline', { status: 503 })));
+  // DO NOT call event.respondWith for API calls, non-GET, or cross-origin requests!
+  // This lets the browser handle native network requests cleanly without SW interference.
+  if (
+    request.method !== 'GET' ||
+    url.pathname.startsWith('/api') ||
+    url.hostname !== self.location.hostname
+  ) {
     return;
   }
 
-  // Cache-first for everything else
+  // Cache-first strategy with SPA fallback for static assets
   event.respondWith(
     caches.match(request).then((cached) => {
       if (cached) return cached;
-      return fetch(request).then((response) => {
-        if (response.ok) {
-          const clone = response.clone();
-          caches.open(CACHE_NAME).then((cache) => cache.put(request, clone));
-        }
-        return response;
-      });
+      return fetch(request)
+        .then((response) => {
+          if (response.ok && response.type === 'basic') {
+            const clone = response.clone();
+            caches.open(CACHE_NAME).then((cache) => cache.put(request, clone));
+          }
+          return response;
+        })
+        .catch(() => caches.match('/index.html'));
     })
   );
 });
