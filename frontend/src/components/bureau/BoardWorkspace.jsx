@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import {
   LayoutDashboard, Users, ScanLine, Network, Layers,
-  MessageSquare, Calendar, ClipboardList, HardDrive, Shield, LogOut
+  MessageSquare, Calendar, ClipboardList, HardDrive, Shield, LogOut, Menu, X
 } from 'lucide-react';
 import { ChangePinModal } from '../auth/ChangePinModal';
 import { BoardDashboard } from '../dashboard/BoardDashboard';
@@ -17,6 +17,7 @@ import { BoardBackup } from '../admin/BoardBackup';
 export function BoardWorkspace({ member, onLogout, showToast }) {
   const [page, setPage] = useState('dashboard');
   const [changePinOpen, setChangePinOpen] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const navItems = [
     { id: 'dashboard', icon: <LayoutDashboard size={18} />, label: 'Tableau de Bord' },
@@ -32,24 +33,35 @@ export function BoardWorkspace({ member, onLogout, showToast }) {
 
   const sharedProps = { member, showToast };
 
+  const handleNavClick = (id) => {
+    setPage(id);
+    setSidebarOpen(false);
+  };
+
   return (
     <div className="app-shell">
-      <aside className="sidebar">
+      <div className={`sidebar-overlay ${sidebarOpen ? 'show' : ''}`} onClick={() => setSidebarOpen(false)} />
+      <aside className={`sidebar ${sidebarOpen ? 'open' : ''}`}>
         <div className="sidebar-logo">
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 4 }}>
-            <img src="/logo.png" alt="Logo" style={{ height: 34, width: 'auto', filter: 'drop-shadow(0 0 8px rgba(167,139,250,0.5))' }} />
-            <div>
-              <div className="logo-text" style={{ fontSize: 18, lineHeight: 1 }}>C-TECH</div>
-              <div className="logo-sub" style={{ color: 'var(--accent-secondary)', WebkitTextFillColor: '#a78bfa', fontSize: 10, fontWeight: 700, letterSpacing: 1, textTransform: 'uppercase', marginTop: 2 }}>
-                ESPACE BUREAU
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+              <img src="/logo.png" alt="Logo" style={{ height: 34, width: 'auto', filter: 'drop-shadow(0 0 8px rgba(167,139,250,0.5))' }} />
+              <div>
+                <div className="logo-text" style={{ fontSize: 18, lineHeight: 1 }}>C-TECH</div>
+                <div className="logo-sub" style={{ color: 'var(--accent-secondary)', WebkitTextFillColor: '#a78bfa', fontSize: 10, fontWeight: 700, letterSpacing: 1, textTransform: 'uppercase', marginTop: 2 }}>
+                  ESPACE BUREAU
+                </div>
               </div>
             </div>
+            <button className="mobile-menu-btn" onClick={() => setSidebarOpen(false)} style={{ display: sidebarOpen ? 'flex' : 'none' }}>
+              <X size={18} />
+            </button>
           </div>
         </div>
         <nav className="sidebar-nav">
           <div className="nav-section-label">Administration</div>
           {navItems.map(item => (
-            <div key={item.id} className={`nav-item ${page === item.id ? 'active' : ''}`} onClick={() => setPage(item.id)}>
+            <div key={item.id} className={`nav-item ${page === item.id ? 'active' : ''}`} onClick={() => handleNavClick(item.id)}>
               {item.icon}<span>{item.label}</span>
             </div>
           ))}
@@ -75,6 +87,16 @@ export function BoardWorkspace({ member, onLogout, showToast }) {
       </aside>
 
       <main className="main-content">
+        {/* Mobile Navbar Header */}
+        <div className="mobile-header-bar">
+          <button className="mobile-menu-btn" onClick={() => setSidebarOpen(true)}>
+            <Menu size={20} />
+          </button>
+          <div style={{ fontWeight: 700, fontSize: 15, color: 'var(--accent-primary-light)' }}>
+            C-TECH <span style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 500 }}>— Bureau</span>
+          </div>
+        </div>
+
         {page === 'dashboard' && <BoardDashboard {...sharedProps} />}
         {page === 'members' && <BoardMembers {...sharedProps} />}
         {page === 'scanner' && <BoardScanner {...sharedProps} />}
