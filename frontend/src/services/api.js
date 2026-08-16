@@ -1,4 +1,17 @@
-const API_BASE = import.meta.env.VITE_API_URL || '/api';
+const RENDER_BACKEND_URL = 'https://cms-fbf7.onrender.com/api';
+
+function getApiBase() {
+  const envUrl = import.meta.env.VITE_API_URL;
+  if (envUrl && envUrl !== '/api') {
+    return envUrl;
+  }
+  if (typeof window !== 'undefined' && (window.location.hostname.includes('onrender.com') || window.location.hostname.includes('github.io'))) {
+    return RENDER_BACKEND_URL;
+  }
+  return '/api';
+}
+
+export const API_BASE = getApiBase();
 
 export async function apiFetch(endpoint, options = {}) {
   const url = `${API_BASE}${endpoint}`;
