@@ -1,0 +1,1046 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>C-TECH — Portail Membres &amp; Administration</title>
+<meta name="description" content="Plateforme de gestion du Club Etudiant C-TECH — espace membre et bureau.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&amp;family=JetBrains+Mono:wght@400;700&amp;display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg-primary:#080d18;--bg-secondary:#0b1121;--bg-card:rgba(11,18,36,0.82);--bg-card-hover:rgba(16,26,52,0.9);--bg-glass:rgba(255,255,255,0.03);--bg-glass-hover:rgba(255,255,255,0.06);--bg-input:rgba(255,255,255,0.05);
+  --accent-primary:#6366f1;--accent-primary-light:#818cf8;--accent-secondary:#8b5cf6;--accent-emerald:#10b981;--accent-warning:#f59e0b;--accent-danger:#ef4444;--accent-cyan:#06b6d4;
+  --gradient-primary:linear-gradient(135deg,#6366f1 0%,#8b5cf6 100%);--gradient-subtle:linear-gradient(135deg,rgba(99,102,241,0.12) 0%,rgba(139,92,246,0.08) 100%);--gradient-card:linear-gradient(135deg,rgba(99,102,241,0.06) 0%,rgba(139,92,246,0.04) 100%);
+  --text-primary:#f1f5f9;--text-secondary:#94a3b8;--text-muted:#64748b;--text-accent:#818cf8;
+  --border-primary:rgba(99,102,241,0.22);--border-subtle:rgba(255,255,255,0.07);--border-glass:rgba(255,255,255,0.10);--border-focus:rgba(99,102,241,0.6);
+  --shadow-glow:0 0 40px rgba(99,102,241,0.15);--shadow-card:0 8px 32px rgba(0,0,0,0.45);--shadow-button:0 4px 16px rgba(99,102,241,0.3);
+  --radius-sm:6px;--radius-md:10px;--radius-lg:14px;--radius-xl:18px;--radius-full:9999px;
+  --font-main:'Inter','Segoe UI',sans-serif;--font-mono:'JetBrains Mono','Fira Code',monospace;
+  --transition-fast:120ms cubic-bezier(0.4,0,0.2,1);--transition-normal:220ms cubic-bezier(0.4,0,0.2,1);
+  --sidebar-width:256px;
+}
+html{scroll-behavior:smooth}
+body{font-family:var(--font-main);background:var(--bg-primary);color:var(--text-primary);min-height:100vh;overflow-x:hidden;line-height:1.6;-webkit-font-smoothing:antialiased}
+body::before{content:'';position:fixed;top:-20%;left:-10%;width:55vw;height:55vw;background:radial-gradient(circle,rgba(99,102,241,0.05) 0%,transparent 70%);pointer-events:none;z-index:0}
+body::after{content:'';position:fixed;bottom:-20%;right:-10%;width:45vw;height:45vw;background:radial-gradient(circle,rgba(139,92,246,0.05) 0%,transparent 70%);pointer-events:none;z-index:0}
+#root{position:relative;z-index:1;min-height:100vh}
+::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:var(--bg-secondary)}::-webkit-scrollbar-thumb{background:rgba(99,102,241,0.25);border-radius:var(--radius-full)}::-webkit-scrollbar-thumb:hover{background:rgba(99,102,241,0.45)}
+.app-shell{display:flex;min-height:100vh}
+.sidebar{width:var(--sidebar-width);background:rgba(8,14,30,0.95);border-right:1px solid rgba(255,255,255,0.07);backdrop-filter:blur(20px) saturate(180%);display:flex;flex-direction:column;position:fixed;top:0;left:0;height:100vh;z-index:100;box-shadow:1px 0 0 rgba(255,255,255,0.04),4px 0 24px rgba(0,0,0,0.4);transition:transform 220ms ease}
+.sidebar-logo{padding:24px 20px 18px;border-bottom:1px solid var(--border-subtle)}
+.logo-text{font-size:20px;font-weight:700;background:var(--gradient-primary);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;letter-spacing:-0.3px}
+.logo-sub{font-size:10px;color:var(--text-muted);margin-top:2px;letter-spacing:0.8px;text-transform:uppercase;font-weight:600}
+.sidebar-nav{flex:1;padding:12px;overflow-y:auto}
+.nav-section-label{font-size:10px;font-weight:700;letter-spacing:1.5px;color:var(--text-muted);text-transform:uppercase;padding:12px 12px 6px}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:var(--radius-md);cursor:pointer;color:var(--text-secondary);font-size:13.5px;font-weight:500;transition:all var(--transition-fast);border:1px solid transparent;margin-bottom:1px;user-select:none}
+.nav-item:hover{background:var(--bg-glass-hover);color:var(--text-primary);border-color:var(--border-subtle)}
+.nav-item.active{background:rgba(99,102,241,0.12);color:var(--accent-primary-light);border-color:rgba(99,102,241,0.18)}
+.sidebar-footer{padding:16px;border-top:1px solid var(--border-subtle)}
+.main-content{flex:1;margin-left:var(--sidebar-width);min-height:100vh;display:flex;flex-direction:column}
+.page-header{padding:28px 32px 0;display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.page-title{font-size:28px;font-weight:700;color:var(--text-primary);letter-spacing:-0.5px}
+.page-subtitle{font-size:14px;color:var(--text-secondary);margin-top:4px}
+.page-body{flex:1;padding:24px 32px 32px}
+.card{background:rgba(11,18,36,0.75);border:1px solid rgba(255,255,255,0.08);border-radius:var(--radius-xl);backdrop-filter:blur(16px) saturate(160%);box-shadow:0 4px 24px rgba(0,0,0,0.4),inset 0 1px 0 rgba(255,255,255,0.06);transition:all var(--transition-normal)}
+.card:hover{border-color:rgba(99,102,241,0.22);box-shadow:0 8px 32px rgba(0,0,0,0.5),0 0 0 1px rgba(99,102,241,0.1)}
+.card-header{padding:20px 24px;border-bottom:1px solid var(--border-subtle);display:flex;align-items:center;justify-content:space-between;gap:12px}
+.card-title{font-size:16px;font-weight:700;color:var(--text-primary);display:flex;align-items:center;gap:8px}
+.card-body{padding:24px}
+.card-gradient{background:var(--gradient-card);border-color:var(--border-primary)}
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px}
+.stat-card{background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:var(--radius-lg);padding:20px;transition:all var(--transition-normal);position:relative;overflow:hidden}
+.stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--gradient-primary);border-radius:var(--radius-lg) var(--radius-lg) 0 0}
+.stat-card:hover{border-color:var(--border-primary);transform:translateY(-1px);box-shadow:0 8px 24px rgba(0,0,0,0.4)}
+.stat-icon{width:40px;height:40px;border-radius:var(--radius-md);display:flex;align-items:center;justify-content:center;margin-bottom:12px;background:rgba(99,102,241,0.1);color:var(--accent-primary-light);font-size:20px}
+.stat-value{font-size:28px;font-weight:700;color:var(--text-primary);line-height:1;margin-bottom:5px}
+.stat-label{font-size:13px;color:var(--text-secondary);font-weight:500}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:10px 20px;border-radius:var(--radius-md);font-size:14px;font-weight:600;cursor:pointer;border:none;transition:all var(--transition-fast);white-space:nowrap;font-family:var(--font-main);text-decoration:none}
+.btn:disabled{opacity:0.5;cursor:not-allowed}
+.btn-primary{background:var(--gradient-primary);color:white;box-shadow:var(--shadow-button)}
+.btn-primary:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 6px 20px rgba(99,102,241,0.4)}
+.btn-secondary{background:var(--bg-glass-hover);color:var(--text-primary);border:1px solid var(--border-subtle)}
+.btn-secondary:hover:not(:disabled){background:rgba(255,255,255,0.12);border-color:var(--border-primary)}
+.btn-danger{background:rgba(239,68,68,0.15);color:#f87171;border:1px solid rgba(239,68,68,0.3)}
+.btn-danger:hover:not(:disabled){background:rgba(239,68,68,0.25)}
+.btn-sm{padding:6px 12px;font-size:12px}
+.btn-lg{padding:14px 28px;font-size:16px}
+.w-full{width:100%;justify-content:center}
+.form-group{display:flex;flex-direction:column;gap:6px;margin-bottom:16px}
+.form-label{font-size:13px;font-weight:600;color:var(--text-secondary);letter-spacing:0.3px}
+.form-input,.form-select,.form-textarea{background:var(--bg-input);border:1px solid var(--border-subtle);border-radius:var(--radius-md);padding:11px 14px;font-size:14px;color:var(--text-primary);font-family:var(--font-main);width:100%;transition:all var(--transition-fast);outline:none}
+.form-input:focus,.form-select:focus,.form-textarea:focus{border-color:var(--border-focus);background:rgba(99,102,241,0.05);box-shadow:0 0 0 3px rgba(99,102,241,0.08)}
+.form-input::placeholder{color:var(--text-muted)}
+.form-textarea{resize:vertical;min-height:100px}
+.form-select option{background:#0d1632;color:var(--text-primary)}
+.form-grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.table-wrapper{overflow-x:auto;border-radius:var(--radius-lg);border:1px solid var(--border-subtle)}
+table{width:100%;border-collapse:collapse;background:var(--bg-card)}
+thead tr{background:rgba(99,102,241,0.04);border-bottom:1px solid var(--border-subtle)}
+th{padding:11px 16px;text-align:left;font-size:11px;font-weight:600;letter-spacing:0.8px;text-transform:uppercase;color:var(--text-muted);white-space:nowrap}
+td{padding:14px 16px;font-size:14px;border-bottom:1px solid rgba(255,255,255,0.03);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tbody tr{transition:background var(--transition-fast)}
+tbody tr:hover{background:var(--bg-glass-hover)}
+.table-empty{padding:48px;text-align:center;color:var(--text-muted);font-size:14px}
+.badge{display:inline-flex;align-items:center;padding:3px 10px;border-radius:var(--radius-full);font-size:11px;font-weight:700;letter-spacing:0.4px}
+.badge-primary{background:rgba(99,102,241,0.12);color:var(--accent-primary-light);border:1px solid rgba(99,102,241,0.22)}
+.badge-success{background:rgba(16,185,129,0.12);color:#34d399;border:1px solid rgba(16,185,129,0.25)}
+.badge-warning{background:rgba(245,158,11,0.12);color:#fbbf24;border:1px solid rgba(245,158,11,0.25)}
+.badge-danger{background:rgba(239,68,68,0.12);color:#f87171;border:1px solid rgba(239,68,68,0.25)}
+.badge-purple{background:rgba(124,58,237,0.12);color:#a78bfa;border:1px solid rgba(124,58,237,0.25)}
+.avatar{width:36px;height:36px;border-radius:50%;background:var(--gradient-primary);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;color:white;flex-shrink:0;overflow:hidden}
+.avatar img{width:100%;height:100%;object-fit:cover}
+.alert{display:flex;align-items:center;gap:10px;padding:12px 16px;border-radius:var(--radius-md);font-size:13px;font-weight:500}
+.alert-purple{background:rgba(124,58,237,0.1);border:1px solid rgba(124,58,237,0.25);color:#a78bfa}
+.alert-success{background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.25);color:#34d399}
+.alert-danger{background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.25);color:#f87171}
+.alert-info{background:rgba(6,182,212,0.1);border:1px solid rgba(6,182,212,0.25);color:#67e8f9}
+.toast-container{position:fixed;top:20px;right:20px;z-index:9999;display:flex;flex-direction:column;gap:8px}
+.toast{display:flex;align-items:center;gap:10px;padding:14px 18px;border-radius:var(--radius-lg);font-size:14px;font-weight:500;min-width:280px;max-width:380px;box-shadow:0 8px 32px rgba(0,0,0,0.5);backdrop-filter:blur(16px);animation:slideIn 0.3s ease}
+.toast.success{background:rgba(16,185,129,0.15);border:1px solid rgba(16,185,129,0.3);color:#34d399}
+.toast.error{background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.3);color:#f87171}
+.toast.info{background:rgba(99,102,241,0.15);border:1px solid rgba(99,102,241,0.3);color:#818cf8}
+@keyframes slideIn{from{transform:translateX(100%);opacity:0}to{transform:translateX(0);opacity:1}}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.7);backdrop-filter:blur(6px);z-index:500;display:flex;align-items:center;justify-content:center;padding:20px}
+.modal{background:rgba(11,18,36,0.97);border:1px solid var(--border-glass);border-radius:var(--radius-xl);width:100%;max-width:520px;box-shadow:0 24px 64px rgba(0,0,0,0.7),0 0 0 1px rgba(255,255,255,0.05);animation:modalIn 0.25s ease;max-height:90vh;overflow:auto}
+@keyframes modalIn{from{transform:scale(0.92);opacity:0}to{transform:scale(1);opacity:1}}
+.modal-header{padding:24px;border-bottom:1px solid var(--border-subtle);display:flex;align-items:center;justify-content:space-between}
+.modal-title{font-size:18px;font-weight:700}
+.modal-body{padding:24px}
+.modal-footer{padding:16px 24px;border-top:1px solid var(--border-subtle);display:flex;justify-content:flex-end;gap:10px}
+.auth-page-split{display:flex;min-height:100vh}
+.auth-left-panel{width:480px;min-width:380px;padding:40px;display:flex;flex-direction:column;justify-content:center;gap:28px;position:relative;z-index:1}
+.auth-right-panel{flex:1;position:relative;overflow:hidden}
+.auth-logo{text-align:center}
+.auth-logo-text{font-size:32px;font-weight:800;background:var(--gradient-primary);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;letter-spacing:-0.5px}
+.auth-logo-sub{font-size:12px;color:var(--text-muted);margin-top:4px;letter-spacing:1px;text-transform:uppercase}
+.auth-card{background:rgba(11,18,36,0.85);border:1px solid var(--border-glass);border-radius:var(--radius-xl);padding:28px;backdrop-filter:blur(20px);box-shadow:0 8px 40px rgba(0,0,0,0.5)}
+.auth-tabs-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:22px;background:rgba(255,255,255,0.04);border-radius:var(--radius-md);padding:4px}
+.auth-tab{padding:8px 6px;border-radius:var(--radius-sm);border:none;background:transparent;color:var(--text-muted);font-size:12px;font-weight:600;cursor:pointer;transition:all var(--transition-fast);display:flex;align-items:center;justify-content:center;gap:5px;font-family:var(--font-main)}
+.auth-tab.active{background:rgba(99,102,241,0.18);color:var(--accent-primary-light);border:1px solid rgba(99,102,241,0.25)}
+.auth-tab:hover:not(.active){background:rgba(255,255,255,0.06);color:var(--text-primary)}
+.member-card-container{display:flex;justify-content:center;align-items:center;padding:48px 24px;perspective:1000px}
+.member-card{width:400px;height:252px;background:linear-gradient(135deg,#050b18 0%,#0d1a3d 40%,#1a0a2e 100%);border-radius:20px;border:1px solid rgba(0,212,255,0.35);box-shadow:0 25px 70px rgba(0,0,0,0.7),0 0 0 1px rgba(255,255,255,0.05),inset 0 1px 0 rgba(255,255,255,0.09),0 0 100px rgba(0,212,255,0.12),0 0 40px rgba(124,58,237,0.08);position:relative;overflow:hidden;font-family:var(--font-main);transform-style:preserve-3d;cursor:none;user-select:none;will-change:transform;transition:transform 0.08s ease-out,box-shadow 0.08s ease-out}
+@keyframes holoShimmer{0%{transform:translateX(-100%) skewX(-15deg);opacity:0}20%{opacity:0.6}80%{opacity:0.6}100%{transform:translateX(300%) skewX(-15deg);opacity:0}}
+@keyframes holoGlow{0%,100%{opacity:0.5}50%{opacity:1}}
+@keyframes particlePulse{0%,100%{opacity:0.3;transform:scale(1)}50%{opacity:1;transform:scale(1.8)}}
+@keyframes numberGlow{0%,100%{text-shadow:0 0 6px rgba(0,212,255,0.4)}50%{text-shadow:0 0 18px rgba(0,212,255,0.9),0 0 30px rgba(0,212,255,0.4)}}
+.member-card::before{content:'';position:absolute;inset:0;background:linear-gradient(115deg,transparent 0%,rgba(0,212,255,0.04) 20%,rgba(124,58,237,0.06) 35%,rgba(0,212,255,0.08) 50%,rgba(255,100,180,0.04) 65%,transparent 80%);background-size:300% 300%;border-radius:20px;pointer-events:none;z-index:2;animation:holoGlow 4s ease-in-out infinite}
+.member-card::after{content:'';position:absolute;top:-10%;left:-60%;width:50%;height:120%;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.07) 40%,rgba(0,212,255,0.12) 50%,rgba(255,255,255,0.07) 60%,transparent);transform:skewX(-15deg);border-radius:4px;pointer-events:none;z-index:3;animation:holoShimmer 5s ease-in-out infinite 1s}
+.card-glare{position:absolute;inset:0;border-radius:20px;pointer-events:none;z-index:4;opacity:0;transition:opacity 0.3s;background:radial-gradient(circle at var(--mx,50%) var(--my,50%),rgba(255,255,255,0.15) 0%,rgba(0,212,255,0.06) 30%,transparent 65%)}
+.member-card:hover .card-glare{opacity:1}
+.card-particles{position:absolute;inset:0;pointer-events:none;z-index:1;overflow:hidden;border-radius:20px}
+.card-particle{position:absolute;width:3px;height:3px;border-radius:50%;background:rgba(0,212,255,0.7);animation:particlePulse 2.5s ease-in-out infinite}
+.card-particle:nth-child(1){top:15%;left:42%;animation-delay:0s;background:rgba(0,212,255,0.8)}
+.card-particle:nth-child(2){top:72%;left:18%;animation-delay:0.6s;background:rgba(124,58,237,0.8)}
+.card-particle:nth-child(3){top:35%;left:80%;animation-delay:1.2s;background:rgba(0,212,255,0.6)}
+.card-particle:nth-child(4){top:85%;left:55%;animation-delay:0.3s;background:rgba(255,100,180,0.6)}
+.card-particle:nth-child(5){top:55%;left:30%;animation-delay:1.8s;background:rgba(0,212,255,0.5)}
+.card-particle:nth-child(6){top:20%;left:68%;animation-delay:2.1s;background:rgba(124,58,237,0.7)}
+.card-chip{position:absolute;top:20px;left:20px;display:flex;flex-direction:column;gap:3px;z-index:5}
+.card-chip-lines span{display:block;height:2.5px;width:26px;background:linear-gradient(90deg,rgba(0,212,255,0.9),rgba(124,58,237,0.7));border-radius:2px;box-shadow:0 0 6px rgba(0,212,255,0.4)}
+.card-chip-lines span:nth-child(3){width:18px}
+.card-logo-area{position:absolute;top:16px;right:20px;text-align:right;z-index:5}
+.card-logo-text{font-weight:800;font-size:13px;letter-spacing:1.5px;color:#00d4ff;line-height:1}
+.card-logo-sub{font-size:7.5px;color:#94a3b8;letter-spacing:0.5px}
+.card-member-info{position:absolute;bottom:20px;left:20px;right:118px;z-index:5}
+.card-member-name{font-size:19px;font-weight:700;color:white;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-shadow:0 0 20px rgba(255,255,255,0.2)}
+.card-member-major{font-size:11px;color:rgba(255,255,255,0.5);margin-top:2px}
+.card-member-number{font-size:13px;font-weight:700;background:var(--gradient-primary);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-top:8px;letter-spacing:1.5px;animation:numberGlow 3s ease-in-out infinite}
+.card-member-level{display:inline-block;font-size:10px;background:rgba(0,212,255,0.1);border:1px solid rgba(0,212,255,0.3);border-radius:var(--radius-full);padding:2px 10px;color:var(--accent-primary);margin-top:5px;box-shadow:0 0 10px rgba(0,212,255,0.15)}
+.card-qr-area{position:absolute;bottom:14px;right:14px;width:90px;height:90px;background:white;border-radius:12px;display:flex;align-items:center;justify-content:center;padding:4px;box-shadow:0 4px 16px rgba(0,0,0,0.5),0 0 0 1.5px rgba(0,212,255,0.4),0 0 20px rgba(0,212,255,0.15);z-index:5}
+.org-tree{display:flex;flex-direction:column;align-items:center;padding:24px;overflow-x:auto}
+.org-node{background:var(--bg-card);border:1px solid var(--border-primary);border-radius:var(--radius-lg);padding:16px;min-width:160px;max-width:200px;text-align:center;position:relative;transition:all var(--transition-normal)}
+.org-node:hover{background:var(--bg-card-hover);transform:translateY(-3px);box-shadow:var(--shadow-glow)}
+.org-node.root{background:rgba(0,212,255,0.08);border-color:rgba(0,212,255,0.4)}
+.org-node-role{font-size:12px;font-weight:700;color:var(--accent-primary-light);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px}
+.org-node-name{font-size:13px;font-weight:600;color:var(--text-primary)}
+.org-node-empty{font-size:12px;color:var(--text-muted);font-style:italic}
+.commission-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px}
+.commission-card{background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:var(--radius-xl);padding:20px;transition:all var(--transition-normal);cursor:pointer}
+.commission-card:hover{border-color:var(--border-primary);transform:translateY(-2px);box-shadow:var(--shadow-glow)}
+.chat-bubble{padding:10px 14px;border-radius:16px;font-size:14px;line-height:1.5}
+.chat-bubble.other{background:rgba(99,102,241,0.1);border:1px solid rgba(99,102,241,0.15);border-radius:4px 16px 16px 16px}
+.chat-bubble.own{background:rgba(99,102,241,0.25);border:1px solid rgba(99,102,241,0.35);border-radius:16px 4px 16px 16px}
+.calendar-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-top:8px}
+.cal-header{font-size:11px;font-weight:600;color:var(--text-muted);text-align:center;padding:8px 0;text-transform:uppercase;letter-spacing:0.5px}
+.cal-day{min-height:80px;padding:6px;border-radius:var(--radius-sm);background:var(--bg-glass);border:1px solid transparent;transition:all var(--transition-fast);cursor:pointer}
+.cal-day:hover{background:var(--bg-glass-hover);border-color:var(--border-subtle)}
+.cal-day.other-month{opacity:0.3}
+.cal-day.today{border-color:rgba(99,102,241,0.4);background:rgba(99,102,241,0.06)}
+.cal-event{font-size:10px;background:rgba(99,102,241,0.2);border-radius:3px;padding:2px 5px;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.log-entry{padding:14px 20px;border-bottom:1px solid var(--border-subtle);display:flex;gap:12px;align-items:flex-start}
+.log-entry:last-child{border-bottom:none}
+.log-dot{width:8px;height:8px;border-radius:50%;background:var(--accent-primary);flex-shrink:0;margin-top:5px}
+.scanner-frame{width:100%;max-width:420px;margin:0 auto;border-radius:var(--radius-xl);overflow:hidden;border:2px solid var(--border-primary);box-shadow:var(--shadow-glow);background:#000;position:relative;aspect-ratio:4/3}
+.scanner-overlay{position:absolute;inset:0;pointer-events:none;z-index:10}
+.scanner-corner{position:absolute;width:30px;height:30px;border-color:var(--accent-primary);border-style:solid}
+.scanner-corner.tl{top:20px;left:20px;border-width:3px 0 0 3px}
+.scanner-corner.tr{top:20px;right:20px;border-width:3px 3px 0 0}
+.scanner-corner.bl{bottom:20px;left:20px;border-width:0 0 3px 3px}
+.scanner-corner.br{bottom:20px;right:20px;border-width:0 3px 3px 0}
+@keyframes scanLine{0%{top:15%}100%{top:85%}}
+.scanner-line{position:absolute;left:10%;right:10%;height:2px;background:linear-gradient(90deg,transparent,var(--accent-primary),transparent);box-shadow:0 0 8px var(--accent-primary);animation:scanLine 2s ease-in-out infinite alternate}
+.antigravity-canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+.flex{display:flex}.items-center{align-items:center}.justify-between{justify-content:space-between}.gap-2{gap:8px}.gap-3{gap:12px}.text-muted{color:var(--text-muted)}.hidden{display:none!important}
+.fade-in{animation:fadeIn 0.3s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+@media(max-width:768px){
+  .auth-right-panel{display:none}.auth-left-panel{width:100%;padding:24px}
+  .sidebar{transform:translateX(-100%)}.sidebar.open{transform:translateX(0)}
+  .main-content{margin-left:0}.page-header{padding:20px 16px 0}.page-body{padding:16px}
+  .form-grid-2{grid-template-columns:1fr}.stats-grid{grid-template-columns:1fr 1fr}
+  .member-card{width:320px;height:202px}
+}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<div class="toast-container" id="toastContainer"></div>
+<script>
+// C-TECH CMS Demo - Full Application
+const MOCK_MEMBERS=[
+  {id:1,member_number:'CT-2026-0001',first_name:'Amina',last_name:'Bensalem',major:'Genie Logiciel',level:'2eme annee',email:'amina@univ.dz',phone:'0555-123',is_bureau:false,status:'actif',photo_path:null,created_at:'2026-01-15T10:00:00',private_notes:''},
+  {id:2,member_number:'CT-2026-0002',first_name:'Karim',last_name:'Mansour',major:'CyberSecurite',level:'3eme annee',email:'karim@univ.dz',phone:'0555-234',is_bureau:false,status:'actif',photo_path:null,created_at:'2026-01-18T11:00:00',private_notes:''},
+  {id:3,member_number:'CT-2026-0003',first_name:'Sara',last_name:'Aitsi',major:'Data & IA',level:'1ere annee',email:'sara@univ.dz',phone:'0555-345',is_bureau:false,status:'actif',photo_path:null,created_at:'2026-02-01T09:00:00',private_notes:''},
+  {id:4,member_number:'CT-2026-0004',first_name:'Yacine',last_name:'Boukratem',major:'Marketing Digital',level:'2eme annee',email:'yacine@univ.dz',phone:'0555-456',is_bureau:false,status:'inactif',photo_path:null,created_at:'2026-02-10T14:00:00',private_notes:'Absent depuis mars'},
+  {id:5,member_number:'CT-2026-0005',first_name:'Lina',last_name:'Ferhat',major:'Finance & Gestion',level:'3eme annee',email:'lina@univ.dz',phone:'0555-567',is_bureau:false,status:'actif',photo_path:null,created_at:'2026-02-20T16:00:00',private_notes:''},
+  {id:6,member_number:'CT-ADMIN',first_name:'Bureau',last_name:'Admin',major:'Administration',level:'Bureau',email:'admin@clubtech.org',phone:'0000',is_bureau:true,status:'actif',photo_path:null,created_at:'2026-01-01T00:00:00',private_notes:''},
+];
+let members=[...MOCK_MEMBERS];
+let attendance=[
+  {id:1,member_id:1,event_name:'Atelier Python',scanned_at:'2026-03-05T10:30:00'},
+  {id:2,member_id:1,event_name:'Hackathon C-TECH #1',scanned_at:'2026-03-15T09:00:00'},
+  {id:3,member_id:2,event_name:'Atelier Python',scanned_at:'2026-03-05T10:32:00'},
+  {id:4,member_id:3,event_name:'Conference IA',scanned_at:'2026-04-02T14:00:00'},
+];
+let commissions=[
+  {id:1,name:'Commission Technique',description:'Ateliers, formations et projets technologiques.',member_count:3},
+  {id:2,name:'Commission Communication',description:'Reseaux sociaux, design et communication externe.',member_count:2},
+  {id:3,name:'Commission Evenements',description:'Organisation des hackathons et conferences.',member_count:4},
+  {id:4,name:'Commission Finance',description:'Gestion du budget et tresorerie.',member_count:1},
+];
+let orgChart=[
+  {id:1,role_name:'President',parent_id:null,member:{first_name:'Bureau',last_name:'Admin'}},
+  {id:2,role_name:'Vice-President',parent_id:1,member:{first_name:'Karim',last_name:'Mansour'}},
+  {id:3,role_name:'Secretaire General',parent_id:1,member:{first_name:'Amina',last_name:'Bensalem'}},
+  {id:4,role_name:'Resp. Technique',parent_id:2,member:{first_name:'Sara',last_name:'Aitsi'}},
+  {id:5,role_name:'Resp. Communication',parent_id:2,member:{first_name:'Lina',last_name:'Ferhat'}},
+  {id:6,role_name:'Tresorier',parent_id:3,member:null},
+];
+let calendarEvents=[
+  {id:1,title:'Atelier Python Avance',description:'Pandas, NumPy',start_date:'2026-08-20',end_date:'2026-08-20'},
+  {id:2,title:'Hackathon C-TECH #2',description:'48h pour innover',start_date:'2026-08-25',end_date:'2026-08-26'},
+  {id:3,title:'Reunion Bureau',description:'Point mensuel',start_date:'2026-09-01',end_date:'2026-09-01'},
+  {id:4,title:'Conference Cybersecurite',description:'Expert invite',start_date:'2026-09-10',end_date:'2026-09-10'},
+];
+let logs=[
+  {id:1,operator_name:'Bureau Admin',action_description:"Inscription d'Amina Bensalem (CT-2026-0001)",timestamp:'2026-01-15T10:02:00'},
+  {id:2,operator_name:'Bureau Admin',action_description:"Scan de presence: Amina Bensalem — Atelier Python",timestamp:'2026-03-05T10:30:00'},
+  {id:3,operator_name:'Bureau Admin',action_description:"Commission 'Commission Technique' creee",timestamp:'2026-02-01T08:00:00'},
+  {id:4,operator_name:'Bureau Admin',action_description:"Statut de Yacine Boukratem mis a jour: inactif",timestamp:'2026-04-01T15:30:00'},
+  {id:5,operator_name:'Bureau Admin',action_description:"Evenement 'Hackathon C-TECH #2' ajoute au calendrier",timestamp:'2026-07-15T09:00:00'},
+];
+let discussion=[
+  {id:1,member_id:2,sender_name:'Karim Mansour',message:'Bonjour ! La reunion de cette semaine est confirmee pour vendredi a 14h.',sent_at:'2026-08-14T09:15:00'},
+  {id:2,member_id:3,sender_name:'Sara Aitsi',message:"Parfait ! J'ai termine le rapport sur le hackathon. Je l'enverrai avant la reunion.",sent_at:'2026-08-14T09:22:00'},
+  {id:3,member_id:1,sender_name:'Amina Bensalem',message:"Super nouvelles ! On peut prevoir aussi un point sur les inscriptions ?",sent_at:'2026-08-14T10:05:00'},
+  {id:4,member_id:5,sender_name:'Lina Ferhat',message:"Le budget pour le Hackathon #2 est valide. On peut commencer la communication externe !",sent_at:'2026-08-16T11:00:00'},
+];
+
+let currentUser=null,currentPage='';
+
+function fmt(iso){if(!iso)return'—';try{return new Date(iso).toLocaleString('fr-FR',{dateStyle:'short',timeStyle:'short'});}catch(e){return iso;}}
+function initials(m){if(!m)return'?';return((m.first_name||'?')[0]+(m.last_name||'?')[0]).toUpperCase();}
+function badgeStatus(s){const map={actif:'badge-success',inactif:'badge-warning',suspendu:'badge-danger',alumni:'badge-purple'};return `<span class="badge ${map[s]||'badge-primary'}">${s}</span>`;}
+function av(m){return `<div class="avatar">${initials(m)}</div>`;}
+function showToast(msg,type='info'){const c=document.getElementById('toastContainer');const d=document.createElement('div');d.className=`toast ${type}`;d.innerHTML=`<span style="flex:1">${msg}</span><span style="cursor:pointer;margin-left:8px;opacity:0.6" onclick="this.parentElement.remove()">x</span>`;c.appendChild(d);setTimeout(()=>d.remove(),3500);}
+function closeModal(id){const el=document.getElementById(id);if(el)el.classList.add('hidden');}
+
+function render(){
+  const root=document.getElementById('root');
+  if(!currentUser){root.innerHTML=renderAuth();initAuthPage();initCanvas();}
+  else if(currentUser.is_bureau){root.innerHTML=renderBureauWS();initBureauWS();}
+  else{root.innerHTML=renderMemberWS();initMemberWS();}
+}
+
+// ── AUTH ──────────────────────────────────────────────
+function renderAuth(){
+  return `<div class="auth-page-split">
+  <div class="auth-left-panel">
+    <div class="auth-logo">
+      <div class="auth-logo-text">C-TECH</div>
+      <div class="auth-logo-sub">Portail des Membres &amp; Administration</div>
+    </div>
+    <div class="auth-card" id="authCard">
+      <div class="auth-tabs-3">
+        <button class="auth-tab active" id="tabMember" onclick="switchTab('member')">&#128282; Membre</button>
+        <button class="auth-tab" id="tabBureau" onclick="switchTab('bureau')">&#128737; Bureau</button>
+        <button class="auth-tab" id="tabRegister" onclick="switchTab('register')">&#43; Inscription</button>
+      </div>
+      <div id="tabContent"></div>
+    </div>
+  </div>
+  <div class="auth-right-panel">
+    <canvas id="antigravityCanvas" class="antigravity-canvas"></canvas>
+    <div style="position:absolute;bottom:40px;left:0;right:0;text-align:center;z-index:10;pointer-events:none">
+      <div style="font-size:13px;color:rgba(255,255,255,0.3);letter-spacing:2px;text-transform:uppercase;font-weight:600">C-TECH Club Etudiant</div>
+    </div>
+  </div>
+</div>
+<div id="forgotModal" class="modal-overlay hidden">
+  <div class="modal">
+    <div class="modal-header"><div class="modal-title">Recuperation du Code PIN</div><button onclick="closeModal('forgotModal')" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:20px">x</button></div>
+    <div class="modal-body">
+      <p style="font-size:14px;color:var(--text-secondary);margin-bottom:16px">Saisissez votre email ou numero de membre. Un nouveau PIN sera envoye.</p>
+      <div class="form-group"><label class="form-label">Email ou N de membre</label><input class="form-input" id="forgotInput" placeholder="votre.email@univ.dz"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('forgotModal')">Annuler</button>
+      <button class="btn btn-primary" onclick="handleForgotPin()">Envoyer</button>
+    </div>
+  </div>
+</div>`;
+}
+
+let currentTab='member';
+function switchTab(tab){
+  currentTab=tab;
+  ['Member','Bureau','Register'].forEach(t=>document.getElementById('tab'+t).classList.toggle('active',t.toLowerCase()===tab));
+  renderTabContent();
+}
+function renderTabContent(){
+  const c=document.getElementById('tabContent');
+  if(currentTab==='member'){c.innerHTML=`<form onsubmit="handleMemberLogin(event)">
+    <div class="form-group"><label class="form-label">Numero de Membre</label><input class="form-input" id="mnumber" placeholder="CT-2026-0001" required></div>
+    <div class="form-group"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px"><label class="form-label" style="margin:0">Code PIN</label><button type="button" onclick="document.getElementById('forgotModal').classList.remove('hidden')" style="background:none;border:none;color:var(--accent-primary-light);font-size:12px;cursor:pointer;font-weight:600">Code PIN oublie ?</button></div>
+    <input class="form-input" type="password" id="mpin" placeholder="------" maxlength="6" required></div>
+    <button class="btn btn-primary w-full btn-lg" type="submit" style="margin-top:10px">Se Connecter (Membre)</button>
+    <div style="margin-top:12px;text-align:center;font-size:12px;color:var(--text-muted)">Demo: <code style="color:var(--accent-primary)">CT-2026-0001</code> / PIN <code style="color:var(--accent-primary)">123456</code></div>
+  </form>`;}
+  else if(currentTab==='bureau'){c.innerHTML=`<form onsubmit="handleBureauLogin(event)">
+    <div class="alert alert-purple" style="margin-bottom:14px;font-size:12px">Acces reserve aux administrateurs du bureau C-TECH.</div>
+    <div class="form-group"><label class="form-label">Identifiant Bureau</label><input class="form-input" id="bnumber" value="CT-ADMIN" required></div>
+    <div class="form-group"><label class="form-label">Code PIN Administrateur</label><input class="form-input" type="password" id="bpin" placeholder="------" maxlength="6" required></div>
+    <button class="btn btn-lg w-full" type="submit" style="margin-top:10px;background:linear-gradient(135deg,rgba(124,58,237,0.4),rgba(167,139,250,0.2));border:1px solid rgba(167,139,250,0.5);color:#a78bfa">Se Connecter (Bureau)</button>
+    <div style="margin-top:12px;text-align:center;font-size:12px;color:var(--text-muted)">Demo: <code style="color:#a78bfa">CT-ADMIN</code> / PIN <code style="color:#a78bfa">123456</code></div>
+  </form>`;}
+  else{c.innerHTML=`<form onsubmit="handleRegister(event)">
+    <div class="form-grid-2">
+      <div class="form-group"><label class="form-label">Prenom</label><input class="form-input" id="rfn" placeholder="Ahmed" required></div>
+      <div class="form-group"><label class="form-label">Nom</label><input class="form-input" id="rln" placeholder="Benali" required></div>
+    </div>
+    <div class="form-grid-2">
+      <div class="form-group"><label class="form-label">Filiere</label><select class="form-select" id="rmajor" required><option value="">Filiere...</option><option>Genie Logiciel</option><option>CyberSecurite</option><option>Data et IA</option><option>Management Digital</option><option>Marketing Digital</option><option>Finance</option></select></div>
+      <div class="form-group"><label class="form-label">Niveau</label><select class="form-select" id="rlevel" required><option value="">Niveau...</option><option>1ere annee</option><option>2eme annee</option><option>3eme annee</option></select></div>
+    </div>
+    <div class="form-grid-2">
+      <div class="form-group"><label class="form-label">Email</label><input class="form-input" type="email" id="remail" placeholder="ahmed@univ.dz" required></div>
+      <div class="form-group"><label class="form-label">Telephone</label><input class="form-input" id="rphone" placeholder="0555 123 456" required></div>
+    </div>
+    <button class="btn btn-primary w-full btn-lg" type="submit" style="margin-top:6px">S'inscrire a C-TECH</button>
+  </form>`;}
+}
+function initAuthPage(){renderTabContent();}
+function handleMemberLogin(e){
+  e.preventDefault();
+  const num=document.getElementById('mnumber').value;const pin=document.getElementById('mpin').value;
+  const m=members.find(x=>x.member_number===num);
+  if(!m){showToast('Numero de membre introuvable.','error');return;}
+  if(pin!=='123456'&&pin!=='000000'){showToast('Code PIN incorrect. Essayez 123456.','error');return;}
+  currentUser=m;currentPage='card';showToast('Connexion reussie ! Bienvenue '+m.first_name,'success');setTimeout(render,500);
+}
+function handleBureauLogin(e){
+  e.preventDefault();
+  const num=document.getElementById('bnumber').value;const pin=document.getElementById('bpin').value;
+  const m=members.find(x=>x.member_number===num&&x.is_bureau);
+  if(!m){showToast('Identifiant bureau invalide.','error');return;}
+  if(pin!=='123456'&&pin!=='000000'){showToast('Code PIN incorrect. Essayez 123456.','error');return;}
+  currentUser=m;currentPage='dashboard';showToast('Connexion Bureau reussie !','success');setTimeout(render,500);
+}
+function handleRegister(e){
+  e.preventDefault();
+  const fn=document.getElementById('rfn').value,ln=document.getElementById('rln').value;
+  const major=document.getElementById('rmajor').value,level=document.getElementById('rlevel').value;
+  const email=document.getElementById('remail').value,phone=document.getElementById('rphone').value;
+  const num='CT-2026-00'+String(members.length).padStart(2,'0');
+  const pin=Math.floor(100000+Math.random()*900000).toString();
+  const newM={id:members.length+1,member_number:num,first_name:fn,last_name:ln,major,level,email,phone,is_bureau:false,status:'actif',photo_path:null,created_at:new Date().toISOString(),private_notes:''};
+  members.push(newM);
+  document.getElementById('authCard').innerHTML=`<div style="text-align:center"><div style="font-size:52px;margin-bottom:14px">&#127881;</div>
+    <h2 style="font-size:22px;margin-bottom:8px;font-weight:700">Inscription Reussie !</h2>
+    <p style="color:var(--text-muted);margin-bottom:20px;font-size:13px">Votre carte virtuelle a ete generee et envoyee par email.</p>
+    <div class="card card-gradient" style="margin-bottom:18px"><div class="card-body" style="padding:14px">
+      <div style="margin-bottom:8px"><span style="font-size:13px;color:var(--text-muted)">Numero: </span><strong style="color:var(--accent-primary-light);font-family:monospace">${num}</strong></div>
+      <div><span style="font-size:13px;color:var(--text-muted)">PIN de depart: </span><strong style="font-family:monospace;font-size:20px;letter-spacing:4px">${pin}</strong></div>
+      <div style="font-size:11px;color:#eab308;margin-top:8px">Code valable 24h. Changez votre PIN a la premiere connexion.</div>
+    </div></div>
+    <button class="btn btn-primary w-full" onclick="directLogin(${newM.id})">Se connecter maintenant</button></div>`;
+}
+function directLogin(id){currentUser=members.find(x=>x.id===id);currentPage='card';render();}
+function handleForgotPin(){
+  const val=document.getElementById('forgotInput').value.trim();
+  if(!val)return;
+  showToast('Un nouveau PIN a ete envoye !','success');
+  closeModal('forgotModal');
+}
+
+// ── BUREAU WORKSPACE ──────────────────────────────────
+const BUREAU_NAV=[
+  {id:'dashboard',ico:'&#128202;',label:'Tableau de Bord'},
+  {id:'members',ico:'&#128101;',label:'Membres'},
+  {id:'scanner',ico:'&#128247;',label:'Scanner QR'},
+  {id:'orgchart',ico:'&#127760;',label:'Organigramme'},
+  {id:'commissions',ico:'&#127963;',label:'Commissions'},
+  {id:'communication',ico:'&#128172;',label:'Communication'},
+  {id:'calendar',ico:'&#128197;',label:'Calendrier'},
+  {id:'logs',ico:'&#128203;',label:'Journaux'},
+  {id:'backup',ico:'&#128190;',label:'Sauvegarde'},
+];
+function renderBureauWS(){
+  return `<div class="app-shell">
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div style="display:flex;align-items:center;gap:10px">
+        <div style="width:34px;height:34px;background:var(--gradient-primary);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:800;color:white">C</div>
+        <div><div class="logo-text">C-TECH</div><div class="logo-sub" style="color:#a78bfa">ESPACE BUREAU</div></div>
+      </div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section-label">Administration</div>
+      ${BUREAU_NAV.map(it=>`<div class="nav-item ${currentPage===it.id?'active':''}" id="nav-${it.id}" onclick="setBureauPage('${it.id}')"><span style="font-size:16px">${it.ico}</span><span>${it.label}</span></div>`).join('')}
+    </nav>
+    <div class="sidebar-footer">
+      <div class="flex items-center gap-3" style="margin-bottom:12px">
+        <div class="avatar" style="background:linear-gradient(135deg,#7c3aed,#a78bfa)">B</div>
+        <div><div style="font-size:13px;font-weight:600">${currentUser.first_name} ${currentUser.last_name}</div><div style="font-size:11px;color:#a78bfa">Espace Bureau</div></div>
+      </div>
+      <button class="btn btn-secondary w-full" onclick="logout()" style="justify-content:center;gap:8px">Deconnexion</button>
+    </div>
+  </aside>
+  <main class="main-content" id="mainContent"></main>
+</div>`;
+}
+function initBureauWS(){setBureauPage(currentPage||'dashboard');}
+function setBureauPage(page){
+  currentPage=page;
+  document.querySelectorAll('.nav-item').forEach(el=>el.classList.remove('active'));
+  const navEl=document.getElementById('nav-'+page);if(navEl)navEl.classList.add('active');
+  const main=document.getElementById('mainContent');if(!main)return;
+  const pages={dashboard:renderDashboard,members:renderMembers,scanner:renderScanner,orgchart:renderOrgChartB,commissions:renderCommissions,communication:renderComm,calendar:renderCalendar,logs:renderLogs,backup:renderBackup};
+  main.innerHTML=(pages[page]||renderDashboard)();main.classList.add('fade-in');
+  if(page==='communication')initChat();
+  if(page==='calendar')renderCalGrid();
+}
+
+function renderDashboard(){
+  const activeM=members.filter(m=>m.status==='actif'&&!m.is_bureau).length;
+  return `<div class="page-header">
+    <div><h1 class="page-title">Tableau de Bord</h1><p class="page-subtitle">Bienvenue dans l'espace Bureau de C-TECH</p></div>
+    <div style="font-size:13px;color:var(--text-muted)">${new Date().toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long',year:'numeric'})}</div>
+  </div>
+  <div class="page-body">
+    <div class="stats-grid" style="margin-bottom:24px">
+      ${[['&#128101;','Membres actifs',activeM],['&#128205;','Presences',attendance.length],['&#127963;','Commissions',commissions.length],['&#128197;','Evenements',calendarEvents.length]].map(([ico,label,val])=>`
+      <div class="stat-card"><div class="stat-icon">${ico}</div><div class="stat-value">${val}</div><div class="stat-label">${label}</div></div>`).join('')}
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+      <div class="card"><div class="card-header"><div class="card-title">&#128101; Derniers inscrits</div></div>
+        <div style="padding:8px 0">${members.filter(m=>!m.is_bureau).slice(-5).reverse().map(m=>`
+        <div class="flex items-center gap-3" style="padding:10px 20px;border-bottom:1px solid var(--border-subtle)">
+          ${av(m)}<div style="flex:1;min-width:0"><div style="font-size:14px;font-weight:600">${m.first_name} ${m.last_name}</div><div style="font-size:12px;color:var(--text-muted)">${m.major} · ${m.level}</div></div>
+          <span class="badge badge-primary" style="font-size:10px">${m.member_number}</span>
+        </div>`).join('')}
+        </div>
+      </div>
+      <div class="card"><div class="card-header"><div class="card-title">&#128203; Activite recente</div></div>
+        <div>${logs.slice(0,6).map(l=>`<div class="log-entry"><div class="log-dot"></div><div><div style="font-size:13px">${l.action_description}</div><div style="font-size:11px;color:var(--text-muted)">Par <strong style="color:var(--accent-primary-light)">${l.operator_name}</strong> · ${fmt(l.timestamp)}</div></div></div>`).join('')}</div>
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderMembers(){
+  return `<div class="page-header">
+    <div><h1 class="page-title">Gestion des Membres</h1><p class="page-subtitle">${members.filter(m=>!m.is_bureau).length} membres</p></div>
+    <div class="flex gap-2">
+      <input class="form-input" id="memberSearch" placeholder="Rechercher..." style="width:200px" oninput="filterMembers(this.value)">
+      <button class="btn btn-primary" onclick="openModal('addMemberModal')">+ Ajouter</button>
+    </div>
+  </div>
+  <div class="page-body"><div class="card"><div class="table-wrapper">
+    <table><thead><tr><th>Membre</th><th>N Carte</th><th>Filiere</th><th>Niveau</th><th>Statut</th><th>Inscrit le</th><th>Actions</th></tr></thead>
+    <tbody id="membersBody">${memberRows(members.filter(m=>!m.is_bureau))}</tbody></table>
+  </div></div></div>
+  <!-- modals -->
+  <div id="addMemberModal" class="modal-overlay hidden"><div class="modal">
+    <div class="modal-header"><div class="modal-title">Ajouter un Membre</div><button onclick="closeModal('addMemberModal')" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:20px">x</button></div>
+    <div class="modal-body">
+      <div class="form-grid-2">
+        <div class="form-group"><label class="form-label">Prenom</label><input class="form-input" id="amFn" placeholder="Ahmed"></div>
+        <div class="form-group"><label class="form-label">Nom</label><input class="form-input" id="amLn" placeholder="Benali"></div>
+      </div>
+      <div class="form-group"><label class="form-label">Email</label><input class="form-input" id="amEmail" type="email" placeholder="ahmed@univ.dz"></div>
+      <div class="form-group"><label class="form-label">Telephone</label><input class="form-input" id="amPhone" placeholder="0555 123 456"></div>
+      <div class="form-grid-2">
+        <div class="form-group"><label class="form-label">Filiere</label><select class="form-select" id="amMajor"><option>Genie Logiciel</option><option>CyberSecurite</option><option>Data et IA</option><option>Management Digital</option><option>Marketing Digital</option><option>Finance</option></select></div>
+        <div class="form-group"><label class="form-label">Niveau</label><select class="form-select" id="amLevel"><option>1ere annee</option><option>2eme annee</option><option>3eme annee</option></select></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('addMemberModal')">Annuler</button>
+      <button class="btn btn-primary" onclick="addMember()">Creer</button>
+    </div>
+  </div></div>
+  <div id="memberDetailModal" class="modal-overlay hidden"><div class="modal" id="memberDetailContent"></div></div>`;
+}
+function openModal(id){document.getElementById(id).classList.remove('hidden');}
+function memberRows(mList){
+  if(!mList.length)return`<tr><td colspan="7" class="table-empty">Aucun membre</td></tr>`;
+  return mList.map(m=>`<tr>
+    <td><div class="flex items-center gap-3">${av(m)}<div><div style="font-weight:600">${m.first_name} ${m.last_name}</div><div style="font-size:12px;color:var(--text-muted)">${m.email}</div></div></div></td>
+    <td><code style="font-size:12px;color:var(--accent-primary-light)">${m.member_number}</code></td>
+    <td style="font-size:13px">${m.major}</td>
+    <td><span class="badge badge-purple">${m.level}</span></td>
+    <td>${badgeStatus(m.status)}</td>
+    <td style="font-size:12px;color:var(--text-muted)">${fmt(m.created_at)}</td>
+    <td><div class="flex gap-2">
+      <button class="btn btn-sm btn-secondary" onclick="viewMember(${m.id})">Voir</button>
+      <button class="btn btn-sm btn-danger" onclick="deleteMember(${m.id})">Del</button>
+    </div></td>
+  </tr>`).join('');
+}
+function filterMembers(q){
+  const filtered=members.filter(m=>!m.is_bureau).filter(m=>`${m.first_name} ${m.last_name} ${m.member_number} ${m.major}`.toLowerCase().includes(q.toLowerCase()));
+  const el=document.getElementById('membersBody');if(el)el.innerHTML=memberRows(filtered);
+}
+function addMember(){
+  const fn=document.getElementById('amFn').value.trim(),ln=document.getElementById('amLn').value.trim();
+  const email=document.getElementById('amEmail').value.trim(),phone=document.getElementById('amPhone').value.trim();
+  const major=document.getElementById('amMajor').value,level=document.getElementById('amLevel').value;
+  if(!fn||!ln||!email){showToast('Champs obligatoires manquants.','error');return;}
+  const num='CT-2026-'+String(members.length).padStart(4,'0');
+  members.push({id:members.length+1,member_number:num,first_name:fn,last_name:ln,major,level,email,phone,is_bureau:false,status:'actif',photo_path:null,created_at:new Date().toISOString(),private_notes:''});
+  logs.unshift({id:logs.length+1,operator_name:`${currentUser.first_name} ${currentUser.last_name}`,action_description:`Ajout du membre ${fn} ${ln} (${num}).`,timestamp:new Date().toISOString()});
+  closeModal('addMemberModal');showToast(`Membre ${fn} ${ln} ajoute !`,'success');
+  const el=document.getElementById('membersBody');if(el)el.innerHTML=memberRows(members.filter(m=>!m.is_bureau));
+}
+function deleteMember(id){
+  const m=members.find(x=>x.id===id);if(!confirm(`Supprimer ${m.first_name} ${m.last_name} ?`))return;
+  members=members.filter(x=>x.id!==id);showToast('Membre supprime.','success');
+  const el=document.getElementById('membersBody');if(el)el.innerHTML=memberRows(members.filter(m=>!m.is_bureau));
+}
+function viewMember(id){
+  const m=members.find(x=>x.id===id);const attM=attendance.filter(a=>a.member_id===id);
+  document.getElementById('memberDetailContent').innerHTML=`
+    <div class="modal-header"><div class="modal-title flex items-center gap-3">${av(m)} ${m.first_name} ${m.last_name}</div><button onclick="closeModal('memberDetailModal')" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:20px">x</button></div>
+    <div class="modal-body">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px">
+        ${[['N Membre',m.member_number],['Filiere',m.major],['Niveau',m.level],['Email',m.email],['Tel',m.phone],['Statut',m.status],['Inscrit le',fmt(m.created_at)]].map(([l,v])=>`<div><div style="font-size:11px;color:var(--text-muted);font-weight:600;text-transform:uppercase">${l}</div><div style="font-size:14px;font-weight:600">${v||'—'}</div></div>`).join('')}
+      </div>
+      <div class="form-group" style="margin-bottom:20px"><label class="form-label">Changer le statut</label>
+        <select class="form-select" onchange="updateStatus(${id},this.value)">${['actif','inactif','suspendu','alumni'].map(s=>`<option ${m.status===s?'selected':''}>${s}</option>`).join('')}</select>
+      </div>
+      <h3 style="font-size:14px;font-weight:700;margin-bottom:10px">Presences (${attM.length})</h3>
+      ${attM.length?attM.map(a=>`<div style="font-size:13px;padding:8px 0;border-bottom:1px solid var(--border-subtle)">${a.event_name} <span style="color:var(--text-muted);font-size:11px">— ${fmt(a.scanned_at)}</span></div>`).join(''):'<div style="color:var(--text-muted);font-size:13px">Aucune presence</div>'}
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('memberDetailModal')">Fermer</button>
+      <button class="btn btn-primary" onclick="showToast('Carte envoyee par email !','success')">Envoyer la Carte</button>
+    </div>`;
+  openModal('memberDetailModal');
+}
+function updateStatus(id,status){const m=members.find(x=>x.id===id);m.status=status;showToast('Statut mis a jour: '+status,'success');}
+
+function renderScanner(){
+  return `<div class="page-header"><div><h1 class="page-title">Scanner QR Code</h1><p class="page-subtitle">Enregistrez les presences par scan</p></div></div>
+  <div class="page-body"><div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:start">
+    <div>
+      <div class="scanner-frame"><div style="display:flex;align-items:center;justify-content:center;height:100%;flex-direction:column;gap:16px;padding:40px">
+        <div style="font-size:64px">&#128247;</div>
+        <div style="font-size:14px;color:var(--text-muted);text-align:center">Camera non disponible en mode demo. Utilisez la saisie manuelle.</div>
+      </div>
+      <div class="scanner-overlay"><div class="scanner-corner tl"></div><div class="scanner-corner tr"></div><div class="scanner-corner bl"></div><div class="scanner-corner br"></div><div class="scanner-line"></div></div>
+      </div>
+    </div>
+    <div>
+      <div class="card"><div class="card-header"><div class="card-title">Saisie Manuelle</div></div>
+        <div class="card-body">
+          <div class="form-group"><label class="form-label">Numero de Membre</label><input class="form-input" id="scanNum" placeholder="CT-2026-0001"></div>
+          <div class="form-group"><label class="form-label">Evenement</label>
+            <select class="form-select" id="scanEvent">${calendarEvents.map(e=>`<option value="${e.id}">${e.title}</option>`).join('')}<option value="0">Autre evenement</option></select>
+          </div>
+          <button class="btn btn-primary w-full" onclick="doScan()">Enregistrer la Presence</button>
+        </div>
+      </div>
+      <div class="card" style="margin-top:16px"><div class="card-header"><div class="card-title">Dernieres presences</div></div>
+        <div id="recentScans" style="padding:8px 0">${recentScansHtml()}</div>
+      </div>
+    </div>
+  </div></div>`;
+}
+function recentScansHtml(){
+  return attendance.slice(-5).reverse().map(a=>{const m=members.find(x=>x.id===a.member_id);return`<div class="flex items-center gap-3" style="padding:10px 20px;border-bottom:1px solid var(--border-subtle)">${av(m||{first_name:'?',last_name:'?'})}<div style="flex:1"><div style="font-size:13px;font-weight:600">${m?`${m.first_name} ${m.last_name}`:'Inconnu'}</div><div style="font-size:11px;color:var(--text-muted)">${a.event_name} · ${fmt(a.scanned_at)}</div></div></div>`;}).join('');
+}
+function doScan(){
+  const num=document.getElementById('scanNum').value.trim();const evId=document.getElementById('scanEvent').value;
+  const m=members.find(x=>x.member_number===num);
+  if(!m){showToast('Numero introuvable.','error');return;}
+  const ev=evId==='0'?'Evenement':calendarEvents.find(e=>e.id===parseInt(evId))?.title||'Evenement';
+  attendance.push({id:attendance.length+1,member_id:m.id,event_name:ev,scanned_at:new Date().toISOString()});
+  logs.unshift({id:logs.length+1,operator_name:`${currentUser.first_name} ${currentUser.last_name}`,action_description:`Presence: ${m.first_name} ${m.last_name} — ${ev}`,timestamp:new Date().toISOString()});
+  showToast(`Presence de ${m.first_name} ${m.last_name} enregistree !`,'success');
+  document.getElementById('scanNum').value='';
+  const el=document.getElementById('recentScans');if(el)el.innerHTML=recentScansHtml();
+}
+
+function renderOrgChartB(){
+  return `<div class="page-header"><div><h1 class="page-title">Organigramme</h1><p class="page-subtitle">Structure hierarchique du Bureau C-TECH</p></div>
+    <button class="btn btn-primary" onclick="openModal('addOrgModal')">+ Ajouter un Role</button>
+  </div>
+  <div class="page-body"><div class="card"><div class="card-body" style="overflow-x:auto" id="orgTreeWrap">${orgTreeHtml()}</div></div></div>
+  <div id="addOrgModal" class="modal-overlay hidden"><div class="modal">
+    <div class="modal-header"><div class="modal-title">Ajouter un Role</div><button onclick="closeModal('addOrgModal')" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:20px">x</button></div>
+    <div class="modal-body">
+      <div class="form-group"><label class="form-label">Intitule du Role</label><input class="form-input" id="orgRole" placeholder="Ex: Resp. Technique"></div>
+      <div class="form-group"><label class="form-label">Membre assigne</label><select class="form-select" id="orgMember"><option value="">— Poste vacant —</option>${members.filter(m=>!m.is_bureau).map(m=>`<option value="${m.id}">${m.first_name} ${m.last_name}</option>`).join('')}</select></div>
+      <div class="form-group"><label class="form-label">Rattache a</label><select class="form-select" id="orgParent"><option value="">— Racine —</option>${orgChart.map(n=>`<option value="${n.id}">${n.role_name}</option>`).join('')}</select></div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal('addOrgModal')">Annuler</button><button class="btn btn-primary" onclick="addOrgNode()">Ajouter</button></div>
+  </div></div>`;
+}
+function orgTreeHtml(){
+  const roots=orgChart.filter(n=>!n.parent_id);
+  function nodeHtml(n){
+    const children=orgChart.filter(c=>c.parent_id===n.id);const isRoot=!n.parent_id;
+    return `<div style="display:flex;flex-direction:column;align-items:center">
+      <div class="org-node${isRoot?' root':''}" onclick="deleteOrgNode(${n.id})" title="Clic pour supprimer">
+        ${n.member?`<div style="margin-bottom:8px">${av(n.member)}</div>`:''}
+        <div class="org-node-role">${n.role_name}</div>
+        <div class="${n.member?'org-node-name':'org-node-empty'}">${n.member?`${n.member.first_name} ${n.member.last_name}`:'Vacant'}</div>
+      </div>
+      ${children.length?`<div style="width:2px;height:24px;background:var(--border-primary)"></div><div style="display:flex;gap:16px;position:relative">
+        ${children.length>1?`<div style="position:absolute;top:0;left:50%;transform:translateX(-50%);height:2px;width:calc(100% - 80px);background:var(--border-primary)"></div>`:''}
+        ${children.map(ch=>`<div style="display:flex;flex-direction:column;align-items:center"><div style="width:2px;height:16px;background:var(--border-primary)"></div>${nodeHtml(ch)}</div>`).join('')}
+      </div>`:''}
+    </div>`;
+  }
+  return `<div class="org-tree">${roots.map(r=>nodeHtml(r)).join('')}</div>`;
+}
+function addOrgNode(){
+  const role=document.getElementById('orgRole').value.trim();const mId=document.getElementById('orgMember').value;const pId=document.getElementById('orgParent').value;
+  if(!role){showToast('Intitule requis.','error');return;}
+  const m=mId?members.find(x=>x.id===parseInt(mId)):null;
+  orgChart.push({id:orgChart.length+10,role_name:role,parent_id:pId?parseInt(pId):null,member:m?{first_name:m.first_name,last_name:m.last_name}:null});
+  closeModal('addOrgModal');showToast(`Role "${role}" ajoute !`,'success');
+  const el=document.getElementById('orgTreeWrap');if(el)el.innerHTML=orgTreeHtml();
+}
+function deleteOrgNode(id){
+  if(!confirm('Supprimer ce role ?'))return;
+  orgChart=orgChart.filter(n=>n.id!==id);showToast('Role supprime.','success');
+  const el=document.getElementById('orgTreeWrap');if(el)el.innerHTML=orgTreeHtml();
+}
+
+function renderCommissions(){
+  return `<div class="page-header"><div><h1 class="page-title">Commissions</h1><p class="page-subtitle">Groupes de travail thematiques</p></div>
+    <button class="btn btn-primary" onclick="openModal('addCommModal')">+ Creer</button>
+  </div>
+  <div class="page-body"><div class="commission-grid">${commissions.map(c=>`
+    <div class="commission-card"><div style="font-size:24px;margin-bottom:12px">${['&#128421;','&#128226;','&#127820;','&#128181;'][c.id-1]||'&#128193;'}</div>
+      <div style="font-weight:700;font-size:16px;margin-bottom:6px">${c.name}</div>
+      <div style="font-size:13px;color:var(--text-muted);margin-bottom:14px;line-height:1.4">${c.description}</div>
+      <div class="flex items-center justify-between">
+        <span class="badge badge-primary">${c.member_count} membres</span>
+        <button class="btn btn-sm btn-danger" onclick="deleteComm(${c.id})">Del</button>
+      </div>
+    </div>`).join('')}
+  </div></div>
+  <div id="addCommModal" class="modal-overlay hidden"><div class="modal">
+    <div class="modal-header"><div class="modal-title">Creer une Commission</div><button onclick="closeModal('addCommModal')" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:20px">x</button></div>
+    <div class="modal-body">
+      <div class="form-group"><label class="form-label">Nom</label><input class="form-input" id="commName" placeholder="Commission Innovation"></div>
+      <div class="form-group"><label class="form-label">Description</label><textarea class="form-textarea" id="commDesc" placeholder="Objectifs..."></textarea></div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal('addCommModal')">Annuler</button><button class="btn btn-primary" onclick="addComm()">Creer</button></div>
+  </div></div>`;
+}
+function addComm(){
+  const name=document.getElementById('commName').value.trim(),desc=document.getElementById('commDesc').value.trim();
+  if(!name){showToast('Nom requis.','error');return;}
+  commissions.push({id:commissions.length+1,name,description:desc||'Aucune description.',member_count:0});
+  logs.unshift({id:logs.length+1,operator_name:`${currentUser.first_name} ${currentUser.last_name}`,action_description:`Commission "${name}" creee.`,timestamp:new Date().toISOString()});
+  closeModal('addCommModal');showToast(`Commission "${name}" creee !`,'success');setBureauPage('commissions');
+}
+function deleteComm(id){
+  const c=commissions.find(x=>x.id===id);if(!confirm(`Supprimer "${c.name}" ?`))return;
+  commissions=commissions.filter(x=>x.id!==id);showToast('Commission supprimee.','success');setBureauPage('commissions');
+}
+
+function renderComm(){
+  return `<div class="page-header"><div><h1 class="page-title">Communication</h1><p class="page-subtitle">Discussion interne et emails</p></div></div>
+  <div class="page-body" style="display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start">
+    <div class="card" style="display:flex;flex-direction:column">
+      <div class="card-header"><div class="card-title">Discussion Interne</div></div>
+      <div id="chatMessages" style="height:400px;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:10px">${discussion.map(msg=>msgHtml(msg)).join('')}</div>
+      <div style="padding:16px;border-top:1px solid var(--border-subtle);display:flex;gap:10px">
+        <input class="form-input" id="chatInput" placeholder="Votre message..." onkeydown="if(event.key==='Enter')sendMsg()" style="flex:1">
+        <button class="btn btn-primary" onclick="sendMsg()">Envoyer</button>
+      </div>
+    </div>
+    <div class="card"><div class="card-header"><div class="card-title">Email en Masse</div></div>
+      <div class="card-body">
+        <div class="form-group"><label class="form-label">Destinataires</label><select class="form-select" id="emailTarget"><option value="all">Tous les membres actifs</option><option value="c1">Commission Technique</option></select></div>
+        <div class="form-group"><label class="form-label">Objet</label><input class="form-input" id="emailSubject" placeholder="Objet de l'email"></div>
+        <div class="form-group"><label class="form-label">Message</label><textarea class="form-textarea" id="emailBody" placeholder="Votre message..."></textarea></div>
+        <button class="btn btn-primary w-full" onclick="sendMassEmail()">Envoyer</button>
+      </div>
+    </div>
+  </div>`;
+}
+function msgHtml(msg){
+  const isOwn=msg.member_id===currentUser.id;const m=members.find(x=>x.id===msg.member_id);
+  return `<div style="display:flex;gap:10px;max-width:75%;${isOwn?'align-self:flex-end;flex-direction:row-reverse':''}">
+    ${!isOwn?av(m||{first_name:'?',last_name:'?'}):''}
+    <div>
+      ${!isOwn?`<div style="font-size:11px;color:var(--text-muted);margin-bottom:3px">${msg.sender_name}</div>`:''}
+      <div class="chat-bubble ${isOwn?'own':'other'}">${msg.message}</div>
+      <div style="font-size:10px;color:var(--text-muted);margin-top:4px;text-align:${isOwn?'right':'left'}">${fmt(msg.sent_at)}</div>
+    </div>
+    ${isOwn?av(currentUser):''}
+  </div>`;
+}
+function initChat(){const c=document.getElementById('chatMessages');if(c)c.scrollTop=c.scrollHeight;}
+function sendMsg(){
+  const inp=document.getElementById('chatInput');const msg=inp.value.trim();if(!msg)return;
+  const newMsg={id:discussion.length+1,member_id:currentUser.id,sender_name:`${currentUser.first_name} ${currentUser.last_name}`,message:msg,sent_at:new Date().toISOString()};
+  discussion.push(newMsg);inp.value='';
+  const c=document.getElementById('chatMessages');if(c){c.innerHTML+=msgHtml(newMsg);c.scrollTop=c.scrollHeight;}
+}
+function sendMassEmail(){
+  const subj=document.getElementById('emailSubject').value.trim(),body=document.getElementById('emailBody').value.trim();
+  if(!subj||!body){showToast('Objet et message requis.','error');return;}
+  const n=members.filter(m=>!m.is_bureau&&m.status==='actif').length;
+  showToast(`Email envoye a ${n} membres !`,'success');
+  document.getElementById('emailSubject').value='';document.getElementById('emailBody').value='';
+}
+
+let calYear=new Date().getFullYear(),calMonth=new Date().getMonth();
+function renderCalendar(){
+  return `<div class="page-header"><div><h1 class="page-title">Calendrier</h1><p class="page-subtitle">Evenements et activites</p></div>
+    <button class="btn btn-primary" onclick="openModal('addEventModal')">+ Ajouter</button>
+  </div>
+  <div class="page-body">
+    <div class="card"><div class="card-header">
+      <button class="btn btn-secondary btn-sm" onclick="chgMonth(-1)">&#9664;</button>
+      <div class="card-title" id="calTitle"></div>
+      <button class="btn btn-secondary btn-sm" onclick="chgMonth(1)">&#9654;</button>
+    </div><div class="card-body"><div id="calGrid"></div></div></div>
+    <div class="card" style="margin-top:16px"><div class="card-header"><div class="card-title">Evenements programmes</div></div>
+      <div class="table-wrapper"><table><thead><tr><th>Titre</th><th>Debut</th><th>Fin</th><th>Actions</th></tr></thead>
+      <tbody>${calendarEvents.map(e=>`<tr><td style="font-weight:600">${e.title}</td><td>${e.start_date}</td><td>${e.end_date}</td><td><button class="btn btn-sm btn-danger" onclick="deleteEvent(${e.id})">Del</button></td></tr>`).join('')}</tbody>
+      </table></div>
+    </div>
+  </div>
+  <div id="addEventModal" class="modal-overlay hidden"><div class="modal">
+    <div class="modal-header"><div class="modal-title">Ajouter un Evenement</div><button onclick="closeModal('addEventModal')" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:20px">x</button></div>
+    <div class="modal-body">
+      <div class="form-group"><label class="form-label">Titre</label><input class="form-input" id="evTitle" placeholder="Hackathon #3"></div>
+      <div class="form-group"><label class="form-label">Description</label><textarea class="form-textarea" id="evDesc" placeholder="Description..."></textarea></div>
+      <div class="form-grid-2">
+        <div class="form-group"><label class="form-label">Date debut</label><input class="form-input" type="date" id="evStart"></div>
+        <div class="form-group"><label class="form-label">Date fin</label><input class="form-input" type="date" id="evEnd"></div>
+      </div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal('addEventModal')">Annuler</button><button class="btn btn-primary" onclick="addEvent()">Ajouter</button></div>
+  </div></div>`;
+}
+function renderCalGrid(){
+  const months=['Janvier','Fevrier','Mars','Avril','Mai','Juin','Juillet','Aout','Septembre','Octobre','Novembre','Decembre'];
+  const el=document.getElementById('calTitle');if(el)el.textContent=`${months[calMonth]} ${calYear}`;
+  const first=new Date(calYear,calMonth,1).getDay();const startDay=(first+6)%7;
+  const daysInMonth=new Date(calYear,calMonth+1,0).getDate();const prevDays=new Date(calYear,calMonth,0).getDate();
+  const today=new Date();
+  let html=`<div class="calendar-grid">${['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'].map(d=>`<div class="cal-header">${d}</div>`).join('')}`;
+  for(let i=0;i<startDay;i++)html+=`<div class="cal-day other-month"><div style="font-size:13px;color:var(--text-muted)">${prevDays-startDay+i+1}</div></div>`;
+  for(let d=1;d<=daysInMonth;d++){
+    const isToday=today.getFullYear()===calYear&&today.getMonth()===calMonth&&today.getDate()===d;
+    const ds=`${calYear}-${String(calMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const evs=calendarEvents.filter(e=>e.start_date===ds);
+    html+=`<div class="cal-day${isToday?' today':''}"><div style="font-size:13px;font-weight:${isToday?800:600};color:${isToday?'var(--accent-primary-light)':'inherit'}">${d}</div>${evs.map(e=>`<div class="cal-event">${e.title}</div>`).join('')}</div>`;
+  }
+  const total=startDay+daysInMonth;const remaining=(total%7)===0?0:7-(total%7);
+  for(let i=1;i<=remaining;i++)html+=`<div class="cal-day other-month"><div style="font-size:13px;color:var(--text-muted)">${i}</div></div>`;
+  html+='</div>';
+  const g=document.getElementById('calGrid');if(g)g.innerHTML=html;
+}
+function chgMonth(dir){calMonth+=dir;if(calMonth<0){calMonth=11;calYear--;}if(calMonth>11){calMonth=0;calYear++;}renderCalGrid();}
+function addEvent(){
+  const title=document.getElementById('evTitle').value.trim(),desc=document.getElementById('evDesc').value.trim();
+  const start=document.getElementById('evStart').value,end=document.getElementById('evEnd').value;
+  if(!title||!start||!end){showToast('Titre et dates requis.','error');return;}
+  calendarEvents.push({id:calendarEvents.length+1,title,description:desc,start_date:start,end_date:end});
+  logs.unshift({id:logs.length+1,operator_name:`${currentUser.first_name} ${currentUser.last_name}`,action_description:`Evenement "${title}" ajoute.`,timestamp:new Date().toISOString()});
+  closeModal('addEventModal');showToast(`Evenement "${title}" ajoute !`,'success');setBureauPage('calendar');
+}
+function deleteEvent(id){
+  const e=calendarEvents.find(x=>x.id===id);if(!confirm(`Supprimer "${e.title}" ?`))return;
+  calendarEvents=calendarEvents.filter(x=>x.id!==id);showToast('Evenement supprime.','success');setBureauPage('calendar');
+}
+
+function renderLogs(){
+  return `<div class="page-header"><div><h1 class="page-title">Journaux d'Activite</h1><p class="page-subtitle">Historique des actions</p></div></div>
+  <div class="page-body"><div class="card">
+    <div class="card-header"><div class="card-title">Journal des Actions</div><span class="badge badge-primary">${logs.length} entrees</span></div>
+    <div>${logs.map(l=>`<div class="log-entry"><div class="log-dot"></div><div><div style="font-size:13px">${l.action_description}</div><div style="font-size:11px;color:var(--text-muted)">Par <strong style="color:var(--accent-primary-light)">${l.operator_name}</strong> · ${fmt(l.timestamp)}</div></div></div>`).join('')}</div>
+  </div></div>`;
+}
+
+function renderBackup(){
+  return `<div class="page-header"><div><h1 class="page-title">Sauvegarde &amp; Administration</h1><p class="page-subtitle">Gestion de la base de donnees</p></div></div>
+  <div class="page-body"><div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+    <div class="card"><div class="card-header"><div class="card-title">Statistiques</div></div>
+      <div class="card-body">${[['Membres',members.filter(m=>!m.is_bureau).length],['Presences',attendance.length],['Commissions',commissions.length],['Evenements',calendarEvents.length],['Logs',logs.length]].map(([l,v])=>`<div class="flex items-center justify-between" style="padding:10px 0;border-bottom:1px solid var(--border-subtle)"><span>${l}</span><strong style="font-family:monospace;color:var(--accent-primary-light)">${v}</strong></div>`).join('')}
+      </div>
+    </div>
+    <div class="card"><div class="card-header"><div class="card-title">Actions</div></div>
+      <div class="card-body" style="display:flex;flex-direction:column;gap:12px">
+        <button class="btn btn-secondary w-full" onclick="exportData()">Exporter (JSON)</button>
+        <button class="btn btn-secondary w-full" onclick="showToast('Disponible avec le backend connecte.','info')">Importer depuis Excel</button>
+        <div style="border-top:1px solid var(--border-subtle);margin:8px 0"></div>
+        <div class="alert alert-danger" style="font-size:13px">La reinitialisation supprime toutes les donnees.</div>
+        <button class="btn btn-danger w-full" onclick="showToast('Reinitialisation annulee en mode demo.','info')">Reinitialiser la BDD</button>
+      </div>
+    </div>
+  </div></div>`;
+}
+function exportData(){
+  const data={members:members.filter(m=>!m.is_bureau),attendance,commissions,calendarEvents,exportDate:new Date().toISOString()};
+  const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`ctech-backup-${new Date().toISOString().split('T')[0]}.json`;a.click();
+  showToast('Export JSON telecharge !','success');
+}
+
+// ── MEMBER WORKSPACE ──────────────────────────────────
+const MEMBER_NAV=[
+  {id:'card',ico:'&#128282;',label:'Ma Carte'},
+  {id:'profile',ico:'&#9881;',label:'Mon Profil'},
+  {id:'attendance',ico:'&#128205;',label:'Mes Presences'},
+  {id:'chat',ico:'&#128172;',label:'Discussion'},
+  {id:'orgchart',ico:'&#127760;',label:'Organigramme'},
+];
+function renderMemberWS(){
+  return `<div class="app-shell">
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div style="display:flex;align-items:center;gap:10px">
+        <div style="width:34px;height:34px;background:var(--gradient-primary);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:800;color:white">C</div>
+        <div><div class="logo-text">C-TECH</div><div class="logo-sub">ESPACE MEMBRE</div></div>
+      </div>
+    </div>
+    <nav class="sidebar-nav">
+      ${MEMBER_NAV.map(it=>`<div class="nav-item ${currentPage===it.id?'active':''}" id="mnav-${it.id}" onclick="setMemberPage('${it.id}')"><span style="font-size:16px">${it.ico}</span><span>${it.label}</span></div>`).join('')}
+    </nav>
+    <div class="sidebar-footer">
+      <div class="flex items-center gap-3" style="margin-bottom:12px">
+        ${av(currentUser)}<div style="overflow:hidden"><div style="font-size:13px;font-weight:600">${currentUser.first_name} ${currentUser.last_name}</div><div style="font-size:11px;color:var(--text-muted)">${currentUser.member_number}</div></div>
+      </div>
+      <button class="btn btn-secondary w-full" onclick="logout()" style="justify-content:center;gap:8px">Deconnexion</button>
+    </div>
+  </aside>
+  <main class="main-content" id="memberMain"></main>
+</div>`;
+}
+function initMemberWS(){setMemberPage(currentPage||'card');}
+function setMemberPage(page){
+  currentPage=page;
+  document.querySelectorAll('.nav-item').forEach(el=>el.classList.remove('active'));
+  const navEl=document.getElementById('mnav-'+page);if(navEl)navEl.classList.add('active');
+  const main=document.getElementById('memberMain');if(!main)return;
+  const pages={card:renderMCard,profile:renderMProfile,attendance:renderMAtt,chat:renderMChat,orgchart:renderMOrg};
+  main.innerHTML=(pages[page]||renderMCard)();main.classList.add('fade-in');
+  if(page==='card')initVCard();
+  if(page==='chat')initChat();
+}
+
+function renderMCard(){
+  const m=currentUser;
+  return `<div class="page-header">
+    <div><h1 class="page-title">Ma Carte Virtuelle</h1><p class="page-subtitle">Survolez la carte pour l'effet 3D !</p></div>
+    <div class="flex gap-2">
+      <button class="btn btn-secondary" onclick="showToast('PNG disponible avec le frontend complet.','info')">PNG</button>
+      <button class="btn btn-secondary" onclick="showToast('PDF disponible avec le backend connecte.','info')">PDF</button>
+      <button class="btn btn-primary" onclick="showToast('Carte envoyee a ${m.email} !','success')">Envoyer par Email</button>
+    </div>
+  </div>
+  <div class="page-body">
+    <div class="member-card-container">
+      <div class="member-card" id="virtualCard">
+        <div class="card-particles">${[...Array(6)].map(()=>'<div class="card-particle"></div>').join('')}</div>
+        <div class="card-glare" id="cardGlare"></div>
+        <div class="card-chip"><div class="card-chip-lines"><span></span><span></span><span></span></div></div>
+        <div class="card-logo-area"><div class="card-logo-text">C-TECH</div><div class="card-logo-sub">Club Etudiant</div></div>
+        <div class="card-member-info">
+          <div class="card-member-name">${m.first_name} ${m.last_name}</div>
+          <div class="card-member-major">${m.major}</div>
+          <div class="card-member-number">${m.member_number}</div>
+          <div class="card-member-level">${m.level}</div>
+        </div>
+        <div class="card-qr-area"><canvas id="qrCanvas" width="82" height="82"></canvas></div>
+      </div>
+    </div>
+    <div class="card card-gradient" style="max-width:500px;margin:0 auto">
+      <div class="card-body">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+          ${[['Numero Membre',m.member_number,true],['Filiere',m.major],['Niveau',m.level],['Email',m.email],['Telephone',m.phone],['Inscrit le',fmt(m.created_at)]].map(([l,v,a])=>`<div><div style="font-size:11px;color:var(--text-muted);font-weight:600;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:3px">${l}</div><div style="font-size:14px;font-weight:600;color:${a?'var(--accent-primary-light)':'var(--text-primary)'};font-family:${a?'monospace':'inherit'}">${v||'—'}</div></div>`).join('')}
+        </div>
+      </div>
+    </div>
+  </div>`;
+}
+function initVCard(){
+  const card=document.getElementById('virtualCard'),glare=document.getElementById('cardGlare');
+  if(card){
+    card.addEventListener('mousemove',e=>{
+      const r=card.getBoundingClientRect(),cx=r.left+r.width/2,cy=r.top+r.height/2;
+      const dx=e.clientX-cx,dy=e.clientY-cy;
+      const rotY=(dx/(r.width/2))*15,rotX=-(dy/(r.height/2))*15;
+      card.style.transform=`rotateX(${rotX}deg) rotateY(${rotY}deg) scale(1.03)`;
+      card.style.boxShadow=`${-rotY*1.5}px ${rotX*1.5}px 60px rgba(0,0,0,0.7),0 0 100px rgba(0,212,255,0.18)`;
+      if(glare){const mx=((e.clientX-r.left)/r.width)*100,my=((e.clientY-r.top)/r.height)*100;glare.style.setProperty('--mx',`${mx}%`);glare.style.setProperty('--my',`${my}%`);}
+    });
+    card.addEventListener('mouseleave',()=>{card.style.transform='rotateX(0deg) rotateY(0deg) scale(1)';card.style.boxShadow='';});
+  }
+  const cv=document.getElementById('qrCanvas');
+  if(cv){
+    const ctx=cv.getContext('2d'),sz=82;
+    ctx.fillStyle='white';ctx.fillRect(0,0,sz,sz);ctx.fillStyle='#000';
+    const pat=genQR(currentUser.member_number),n=pat.length,cell=sz/n;
+    pat.forEach((row,r)=>row.forEach((on,c)=>{if(on)ctx.fillRect(c*cell,r*cell,cell,cell);}));
+  }
+}
+function genQR(data){
+  const n=15;let grid=Array.from({length:n},()=>Array(n).fill(0));
+  function finder(r,c){for(let i=0;i<7;i++)for(let j=0;j<7;j++)grid[r+i][c+j]=(i===0||i===6||j===0||j===6||(i>=2&&i<=4&&j>=2&&j<=4))?1:0;}
+  finder(0,0);finder(0,n-7);finder(n-7,0);
+  let hash=0;for(let ch of data)hash=(hash*31+ch.charCodeAt(0))&0xFFFFFF;
+  for(let r=2;r<n-2;r++)for(let c=2;c<n-2;c++){if(r<8&&(c<8||c>n-9))continue;if(r>n-9&&c<8)continue;grid[r][c]=((hash>>((r*n+c)%24))&1);}
+  return grid;
+}
+
+function renderMProfile(){
+  return `<div class="page-header"><div><h1 class="page-title">Mon Profil</h1><p class="page-subtitle">Mettez a jour vos coordonnees</p></div></div>
+  <div class="page-body">
+    <div class="card" style="max-width:500px"><div class="card-header"><div class="card-title">Modifier Coordonnees</div></div>
+      <div class="card-body"><form onsubmit="saveProfile(event)">
+        <div class="form-group"><label class="form-label">Email</label><input class="form-input" type="email" id="pemail" value="${currentUser.email}" required></div>
+        <div class="form-group"><label class="form-label">Telephone</label><input class="form-input" id="pphone" value="${currentUser.phone}" required></div>
+        <button class="btn btn-primary" type="submit">Enregistrer</button>
+      </form></div>
+    </div>
+    <div class="card" style="max-width:500px;margin-top:16px"><div class="card-header"><div class="card-title">Changer mon Code PIN</div></div>
+      <div class="card-body"><form onsubmit="changePIN(event)">
+        <div class="form-group"><label class="form-label">PIN actuel</label><input class="form-input" type="password" id="pinOld" maxlength="6" required></div>
+        <div class="form-group"><label class="form-label">Nouveau PIN</label><input class="form-input" type="password" id="pinNew" maxlength="6" required></div>
+        <div class="form-group"><label class="form-label">Confirmer</label><input class="form-input" type="password" id="pinCf" maxlength="6" required></div>
+        <button class="btn btn-primary" type="submit">Changer le PIN</button>
+      </form></div>
+    </div>
+  </div>`;
+}
+function saveProfile(e){e.preventDefault();currentUser.email=document.getElementById('pemail').value;currentUser.phone=document.getElementById('pphone').value;showToast('Coordonnees mises a jour !','success');}
+function changePIN(e){
+  e.preventDefault();
+  const old=document.getElementById('pinOld').value,nw=document.getElementById('pinNew').value,cf=document.getElementById('pinCf').value;
+  if(old!=='123456'){showToast('PIN actuel incorrect.','error');return;}
+  if(nw!==cf){showToast('Les nouveaux PINs ne correspondent pas.','error');return;}
+  showToast('Code PIN modifie !','success');
+}
+
+function renderMAtt(){
+  const myAtt=attendance.filter(a=>a.member_id===currentUser.id);
+  return `<div class="page-header"><div><h1 class="page-title">Mes Presences</h1><p class="page-subtitle">Historique de vos participations</p></div></div>
+  <div class="page-body">
+    <div class="stats-grid" style="margin-bottom:20px">
+      <div class="stat-card"><div class="stat-icon">&#128205;</div><div class="stat-value">${myAtt.length}</div><div class="stat-label">Presences totales</div></div>
+      <div class="stat-card"><div class="stat-icon">&#127919;</div><div class="stat-value">${Math.round((myAtt.length/Math.max(calendarEvents.length,1))*100)}%</div><div class="stat-label">Taux de participation</div></div>
+    </div>
+    <div class="card"><div class="table-wrapper">
+      <table><thead><tr><th>Evenement</th><th>Horodatage</th></tr></thead>
+      <tbody>${myAtt.length===0?`<tr><td colspan="2" class="table-empty">Aucune presence enregistree</td></tr>`:myAtt.map(a=>`<tr><td style="font-weight:600">${a.event_name}</td><td style="font-size:13px;color:var(--text-muted)">${fmt(a.scanned_at)}</td></tr>`).join('')}
+      </tbody></table>
+    </div></div>
+  </div>`;
+}
+
+function renderMChat(){
+  return `<div class="page-header"><div><h1 class="page-title">Discussion</h1><p class="page-subtitle">Espace de communication interne</p></div></div>
+  <div class="page-body">
+    <div class="card" style="display:flex;flex-direction:column;height:calc(100vh - 220px)">
+      <div id="chatMessages" style="flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:10px">${discussion.map(msg=>msgHtml(msg)).join('')}</div>
+      <div style="padding:16px;border-top:1px solid var(--border-subtle);display:flex;gap:10px">
+        <input class="form-input" id="chatInput" placeholder="Votre message..." onkeydown="if(event.key==='Enter')sendMsg()" style="flex:1">
+        <button class="btn btn-primary" onclick="sendMsg()">Envoyer</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderMOrg(){
+  return `<div class="page-header"><div><h1 class="page-title">Organigramme</h1><p class="page-subtitle">Structure du Bureau — lecture seule</p></div></div>
+  <div class="page-body"><div class="card"><div class="card-body" style="overflow-x:auto">${orgTreeHtml()}</div></div></div>`;
+}
+
+// ── CANVAS ────────────────────────────────────────────
+function initCanvas(){
+  const canvas=document.getElementById('antigravityCanvas');
+  if(!canvas||!canvas.parentElement)return;
+  const ctx=canvas.getContext('2d');let animId;
+  let W=(canvas.width=canvas.parentElement.clientWidth),H=(canvas.height=canvas.parentElement.clientHeight);
+  window.addEventListener('resize',()=>{W=canvas.width=canvas.parentElement.clientWidth;H=canvas.height=canvas.parentElement.clientHeight;});
+  const mouse={x:W/2,y:H/2,tx:W/2,ty:H/2};
+  const np=14,base=Math.min(W,H)*0.22;
+  const points=Array.from({length:np},(_,i)=>({angle:(i/np)*Math.PI*2,phase:Math.random()*Math.PI*2,freq:1+Math.random()*1.5}));
+  const particles=Array.from({length:30},()=>({x:Math.random()*W,y:Math.random()*H,size:Math.random()*2.5+1,sx:(Math.random()-0.5)*0.6,sy:(Math.random()-0.5)*0.6,alpha:Math.random()*0.6+0.2}));
+  canvas.parentElement.addEventListener('mousemove',e=>{const r=canvas.getBoundingClientRect();mouse.tx=e.clientX-r.left;mouse.ty=e.clientY-r.top;});
+  let t=0;
+  function render(){
+    t+=0.018;mouse.x+=(mouse.tx-mouse.x)*0.06;mouse.y+=(mouse.ty-mouse.y)*0.06;
+    ctx.clearRect(0,0,W,H);
+    const bg=ctx.createRadialGradient(mouse.x,mouse.y,10,mouse.x,mouse.y,Math.max(W,H)*0.65);
+    bg.addColorStop(0,'rgba(0,212,255,0.16)');bg.addColorStop(0.35,'rgba(124,58,237,0.12)');bg.addColorStop(0.7,'rgba(236,72,153,0.06)');bg.addColorStop(1,'transparent');
+    ctx.fillStyle=bg;ctx.fillRect(0,0,W,H);
+    particles.forEach(p=>{
+      p.x+=p.sx;p.y+=p.sy;
+      if(p.x<0)p.x=W;if(p.x>W)p.x=0;if(p.y<0)p.y=H;if(p.y>H)p.y=0;
+      ctx.beginPath();ctx.arc(p.x,p.y,p.size,0,Math.PI*2);
+      ctx.fillStyle=`rgba(0,212,255,${p.alpha})`;ctx.shadowBlur=8;ctx.shadowColor='#00d4ff';ctx.fill();ctx.shadowBlur=0;
+    });
+    const pts=points.map((p,i)=>{
+      const d=Math.sin(t*p.freq+p.phase)*24+Math.cos(t*1.4+i*0.5)*16;
+      const dx=mouse.x-W/2,dy=mouse.y-H/2;const md=Math.hypot(dx,dy),ma=Math.atan2(dy,dx);
+      const ad=Math.cos(p.angle-ma);const r=base+d+ad*Math.min(md*0.2,50);
+      return{x:mouse.x+Math.cos(p.angle)*r,y:mouse.y+Math.sin(p.angle)*r};
+    });
+    ctx.save();ctx.beginPath();
+    const len=pts.length;ctx.moveTo((pts[0].x+pts[len-1].x)/2,(pts[0].y+pts[len-1].y)/2);
+    for(let i=0;i<len;i++){const p1=pts[i],p2=pts[(i+1)%len];ctx.quadraticCurveTo(p1.x,p1.y,(p1.x+p2.x)/2,(p1.y+p2.y)/2);}
+    ctx.closePath();
+    const g=ctx.createLinearGradient(mouse.x-base,mouse.y-base,mouse.x+base,mouse.y+base);
+    g.addColorStop(0,'rgba(0,212,255,0.8)');g.addColorStop(0.35,'rgba(59,130,246,0.75)');g.addColorStop(0.7,'rgba(124,58,237,0.75)');g.addColorStop(1,'rgba(236,72,153,0.7)');
+    ctx.fillStyle=g;ctx.shadowBlur=45;ctx.shadowColor='rgba(0,212,255,0.65)';ctx.fill();
+    ctx.lineWidth=2;const sg=ctx.createLinearGradient(mouse.x-base,mouse.y-base,mouse.x+base,mouse.y+base);
+    sg.addColorStop(0,'rgba(255,255,255,0.85)');sg.addColorStop(0.5,'rgba(0,212,255,0.5)');sg.addColorStop(1,'rgba(236,72,153,0.7)');
+    ctx.strokeStyle=sg;ctx.stroke();ctx.restore();
+    animId=requestAnimationFrame(render);
+  }
+  render();
+}
+
+function logout(){currentUser=null;currentPage='';showToast('Deconnexion reussie. A bientot !','info');setTimeout(render,400);}
+
+render();
+</script>
+</body>
+</html>

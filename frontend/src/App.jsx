@@ -6,6 +6,7 @@ import { MemberWorkspace } from './components/members/MemberWorkspace';
 import { Toast } from './components/common/Toast';
 
 import { ForceChangePinModal } from './components/auth/ForceChangePinModal';
+import { PWAInstallPrompt } from './components/common/PWAInstallPrompt';
 
 function MainApp() {
   const { currentUser, login, logout } = useAuth();
@@ -33,6 +34,7 @@ export default function App() {
   return (
     <AuthProvider>
       <MainApp />
+      <PWAInstallPrompt />
     </AuthProvider>
   );
 }

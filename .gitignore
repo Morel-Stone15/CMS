@@ -11,6 +11,9 @@ venv/
 env/
 .venv/
 
+# Secrets
+backend/.env
+
 # Uploads and DB
 backend/instance/
 backend/uploads/
@@ -18,3 +21,4 @@ backend/logs/
 
 # Build
 frontend/dist/
+
