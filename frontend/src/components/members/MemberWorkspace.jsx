@@ -180,6 +180,7 @@ export function MemberWorkspace({ member, onLogout, showToast }) {
       </aside>
 
       <main className="main-content">
+        <div key={page} className="page-view">
         {page === 'card' && (
           <>
             <div className="page-header">
@@ -295,20 +296,35 @@ export function MemberWorkspace({ member, onLogout, showToast }) {
         {page === 'orgchart' && (
           <>
             <div className="page-header">
-              <div><h1 className="page-title">Organigramme</h1><p className="page-subtitle">Structure du Bureau — lecture seule</p></div>
+              <div><h1 className="page-title">Organigramme du Club</h1><p className="page-subtitle">Structure hiérarchique officielle de C-TECH</p></div>
             </div>
-            <div className="page-body">
-              <div className="card">
-                <div className="card-body" style={{ overflowX: 'auto' }}>
-                  {orgChart.length === 0
-                    ? <div className="table-empty">Aucun organigramme défini</div>
-                    : <div className="org-tree">{roots.map(r => <OrgNode key={r.id} node={r} />)}</div>}
-                </div>
-              </div>
+            <div className="page-body" style={{ overflowX: 'auto', paddingBottom: 40 }}>
+              {roots.length === 0
+                ? <div className="card"><div className="card-body text-center text-muted">Organigramme non encore configuré</div></div>
+                : <div className="org-tree">{roots.map(r => <OrgNode key={r.id} node={r} />)}</div>
+              }
             </div>
           </>
         )}
+        </div>
       </main>
+
+      <nav className="mobile-bottom-nav">
+        {navItems.map(item => (
+          <button
+            key={item.id}
+            className={`mobile-nav-btn ${page === item.id ? 'active' : ''}`}
+            onClick={() => {
+              setPage(item.id);
+              setSidebarOpen(false);
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
+          >
+            {item.icon}
+            <span>{item.label}</span>
+          </button>
+        ))}
+      </nav>
     </div>
   );
 }

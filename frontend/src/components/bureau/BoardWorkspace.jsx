@@ -93,20 +93,47 @@ export function BoardWorkspace({ member, onLogout, showToast }) {
             <Menu size={20} />
           </button>
           <div style={{ fontWeight: 700, fontSize: 15, color: 'var(--accent-primary-light)' }}>
-            C-TECH <span style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 500 }}>— Bureau</span>
+            C-TECH <span style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 500 }}>— Espace Bureau</span>
           </div>
         </div>
 
-        {page === 'dashboard' && <BoardDashboard {...sharedProps} />}
-        {page === 'members' && <BoardMembers {...sharedProps} />}
-        {page === 'scanner' && <BoardScanner {...sharedProps} />}
-        {page === 'orgchart' && <BoardOrgChart {...sharedProps} />}
-        {page === 'commissions' && <BoardCommissions {...sharedProps} />}
-        {page === 'communication' && <BoardCommunication {...sharedProps} />}
-        {page === 'calendar' && <BoardCalendar {...sharedProps} />}
-        {page === 'logs' && <BoardLogs {...sharedProps} />}
-        {page === 'backup' && <BoardBackup {...sharedProps} />}
+        <div key={page} className="page-view">
+          {page === 'dashboard' && <BoardDashboard {...sharedProps} />}
+          {page === 'members' && <BoardMembers {...sharedProps} />}
+          {page === 'scanner' && <BoardScanner {...sharedProps} />}
+          {page === 'orgchart' && <BoardOrgChart {...sharedProps} />}
+          {page === 'commissions' && <BoardCommissions {...sharedProps} />}
+          {page === 'communication' && <BoardCommunication {...sharedProps} />}
+          {page === 'calendar' && <BoardCalendar {...sharedProps} />}
+          {page === 'logs' && <BoardLogs {...sharedProps} />}
+          {page === 'backup' && <BoardBackup {...sharedProps} />}
+        </div>
       </main>
+
+      {/* Barre de navigation mobile inférieure (Bureau) */}
+      <nav className="mobile-bottom-nav">
+        {[
+          { id: 'dashboard', icon: <LayoutDashboard size={18} />, label: 'Accueil' },
+          { id: 'members', icon: <Users size={18} />, label: 'Membres' },
+          { id: 'scanner', icon: <ScanLine size={18} />, label: 'Scanner' },
+          { id: 'commissions', icon: <Layers size={18} />, label: 'Commissions' },
+          { id: 'communication', icon: <MessageSquare size={18} />, label: 'Chat' },
+        ].map(item => (
+          <button
+            key={item.id}
+            className={`mobile-nav-btn ${page === item.id ? 'active' : ''}`}
+            onClick={() => {
+              setPage(item.id);
+              setSidebarOpen(false);
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
+          >
+            {item.icon}
+            <span>{item.label}</span>
+          </button>
+        ))}
+      </nav>
+
       {changePinOpen && <ChangePinModal member={member} showToast={showToast} onClose={() => setChangePinOpen(false)} />}
     </div>
   );
