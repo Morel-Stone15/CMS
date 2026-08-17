@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { MessageSquare, Send, Paperclip, Mic, Square, File, Trash2, X } from 'lucide-react';
 import { api } from '../../services/api';
 import { fmt } from '../../constants/data';
+import { getMediaUrl } from '../members/VirtualCard';
 
 export function DiscussionView({ member, showToast }) {
   const [chatMessages, setChatMessages] = useState([]);
@@ -21,8 +22,15 @@ export function DiscussionView({ member, showToast }) {
       .catch(err => console.error(err));
   }
 
-  useEffect(() => { loadChat(); }, []);
-  useEffect(() => { chatEndRef.current?.scrollIntoView({ behavior: 'smooth' }); }, [chatMessages]);
+  useEffect(() => {
+    loadChat();
+    const interval = setInterval(loadChat, 4000);
+    return () => clearInterval(interval);
+  }, []);
+
+  useEffect(() => {
+    chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [chatMessages]);
 
   async function sendChat(e) {
     if (e) e.preventDefault();
@@ -113,23 +121,26 @@ export function DiscussionView({ member, showToast }) {
           ) : (
             chatMessages.map(msg => {
               const isOwn = msg.member_id === member.id;
+              const senderPhotoUrl = getMediaUrl(msg.sender_photo);
+              const mediaUrl = getMediaUrl(msg.attachment_path);
+
               return (
                 <div key={msg.id} className={`chat-message ${isOwn ? 'own' : ''}`} style={{ display: 'flex', gap: 12, marginBottom: 16, flexDirection: isOwn ? 'row-reverse' : 'row' }}>
-                  <div className="avatar" style={{ width: 36, height: 36, flexShrink: 0, backgroundImage: msg.sender_photo ? `url(/${msg.sender_photo})` : 'none', backgroundSize: 'cover', display: 'flex', alignItems: 'center', justifyContent: 'center', background: msg.sender_photo ? 'none' : 'var(--bg-secondary)' }}>
-                    {!msg.sender_photo && (msg.sender_name || '?')[0]}
+                  <div className="avatar" style={{ width: 36, height: 36, flexShrink: 0, backgroundImage: senderPhotoUrl ? `url(${senderPhotoUrl})` : 'none', backgroundSize: 'cover', display: 'flex', alignItems: 'center', justifyContent: 'center', background: senderPhotoUrl ? 'none' : 'var(--bg-secondary)' }}>
+                    {!senderPhotoUrl && (msg.sender_name || '?')[0]}
                   </div>
                   <div style={{ maxWidth: '75%', display: 'flex', flexDirection: 'column', alignItems: isOwn ? 'flex-end' : 'flex-start' }}>
                     {!isOwn && <div className="chat-sender" style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-secondary)', marginBottom: 4 }}>{msg.sender_name}</div>}
                     <div className={`chat-bubble ${isOwn ? 'chat-bubble-own' : 'chat-bubble-other'}`} style={{ padding: '8px 12px', borderRadius: 12, background: isOwn ? 'var(--accent-primary)' : 'var(--bg-secondary)', color: isOwn ? '#fff' : 'var(--text-primary)', wordBreak: 'break-word' }}>
                       {msg.message && <div style={{ whiteSpace: 'pre-wrap' }}>{msg.message}</div>}
 
-                      {msg.attachment_path && (
+                      {mediaUrl && (
                         <div style={{ marginTop: msg.message ? 8 : 0 }}>
-                          {msg.attachment_type === 'photo' && <img src={`/${msg.attachment_path}`} alt="attachment" style={{ maxWidth: '100%', borderRadius: 8, cursor: 'pointer' }} onClick={() => window.open(`/${msg.attachment_path}`, '_blank')} />}
-                          {msg.attachment_type === 'video' && <video src={`/${msg.attachment_path}`} controls style={{ maxWidth: '100%', borderRadius: 8 }} />}
-                          {msg.attachment_type === 'voice' && <audio src={`/${msg.attachment_path}`} controls style={{ maxWidth: '100%' }} />}
+                          {msg.attachment_type === 'photo' && <img src={mediaUrl} alt="attachment" style={{ maxWidth: '100%', borderRadius: 8, cursor: 'pointer' }} onClick={() => window.open(mediaUrl, '_blank')} />}
+                          {msg.attachment_type === 'video' && <video src={mediaUrl} controls style={{ maxWidth: '100%', borderRadius: 8 }} />}
+                          {msg.attachment_type === 'voice' && <audio src={mediaUrl} controls style={{ maxWidth: '100%' }} />}
                           {msg.attachment_type === 'document' && (
-                            <a href={`/${msg.attachment_path}`} target="_blank" rel="noreferrer" style={{ display: 'flex', alignItems: 'center', gap: 8, color: 'inherit', textDecoration: 'none', background: 'rgba(0,0,0,0.1)', padding: '6px 10px', borderRadius: 6 }}>
+                            <a href={mediaUrl} target="_blank" rel="noreferrer" style={{ display: 'flex', alignItems: 'center', gap: 8, color: 'inherit', textDecoration: 'none', background: 'rgba(0,0,0,0.1)', padding: '6px 10px', borderRadius: 6 }}>
                               <File size={16} /> <span style={{ fontSize: 13 }}>{msg.attachment_name}</span>
                             </a>
                           )}

@@ -1,15 +1,14 @@
 import { useState, useEffect } from 'react';
-import { Download } from 'lucide-react';
+import { Download, X } from 'lucide-react';
 
 export function PWAInstallPrompt() {
   const [deferredPrompt, setDeferredPrompt] = useState(null);
   const [isInstallable, setIsInstallable] = useState(false);
+  const [dismissed, setDismissed] = useState(false);
 
   useEffect(() => {
     const handler = (e) => {
-      // Prevent the mini-infobar from appearing on mobile
       e.preventDefault();
-      // Stash the event so it can be triggered later.
       setDeferredPrompt(e);
       setIsInstallable(true);
     };
@@ -29,31 +28,61 @@ export function PWAInstallPrompt() {
     setDeferredPrompt(null);
   };
 
-  if (!isInstallable) return null;
+  if (!isInstallable || dismissed) return null;
 
   return (
-    <button
-      onClick={handleInstallClick}
-      className="btn btn-primary"
+    <div
       style={{
         position: 'fixed',
-        bottom: '24px',
-        right: '24px',
+        bottom: '20px',
+        right: '20px',
         zIndex: 99999,
-        boxShadow: '0 8px 24px rgba(0,212,255,0.4)',
-        borderRadius: '50px',
-        padding: '12px 24px',
         display: 'flex',
         alignItems: 'center',
-        gap: '8px',
-        fontWeight: 'bold',
-        fontSize: '14px',
-        animation: 'pulse 2s infinite',
-        border: '1px solid rgba(0,212,255,0.5)'
+        gap: '6px',
+        background: 'rgba(8, 14, 30, 0.95)',
+        border: '1px solid rgba(0, 212, 255, 0.5)',
+        borderRadius: '50px',
+        padding: '6px 8px 6px 16px',
+        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.6), 0 0 20px rgba(0, 212, 255, 0.25)',
+        backdropFilter: 'blur(12px)',
+        WebkitBackdropFilter: 'blur(12px)'
       }}
     >
-      <Download size={18} />
-      Installer l'Application
-    </button>
+      <button
+        onClick={handleInstallClick}
+        className="btn btn-primary"
+        style={{
+          borderRadius: '50px',
+          padding: '8px 16px',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '8px',
+          fontWeight: 'bold',
+          fontSize: '13px',
+          border: 'none'
+        }}
+      >
+        <Download size={16} />
+        Installer l'Application
+      </button>
+      <button
+        onClick={() => setDismissed(true)}
+        style={{
+          background: 'none',
+          border: 'none',
+          color: 'var(--text-muted)',
+          cursor: 'pointer',
+          padding: '6px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          borderRadius: '50%'
+        }}
+        title="Fermer"
+      >
+        <X size={16} />
+      </button>
+    </div>
   );
 }

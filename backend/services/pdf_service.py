@@ -75,8 +75,20 @@ def generate_card_pdf(member):
     qr_size = 20 * mm
     qr_x = card_w - qr_size - 5 * mm
     qr_y = 5 * mm
-    if member.qr_code_path:
-        qr_abs = os.path.join(current_app.config['BASE_DIR'], member.qr_code_path)
+    
+    qr_rel = member.qr_code_path
+    if not qr_rel or not os.path.exists(os.path.join(current_app.config['BASE_DIR'], qr_rel)):
+        try:
+            from services.qr_service import generate_qr_code
+            qr_rel = generate_qr_code(member.member_number)
+            member.qr_code_path = qr_rel
+            from models import db
+            db.session.commit()
+        except Exception:
+            qr_rel = None
+
+    if qr_rel:
+        qr_abs = os.path.join(current_app.config['BASE_DIR'], qr_rel)
         if os.path.exists(qr_abs):
             c.setFillColorRGB(1, 1, 1)
             c.roundRect(qr_x - 1.5, qr_y - 1.5, qr_size + 3, qr_size + 3, 2, stroke=0, fill=1)

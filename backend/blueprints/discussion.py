@@ -114,7 +114,7 @@ def send_mass_email():
     for member in targets:
         if member.member_number == "CT-ADMIN" and not (major_filter or level_filter):
             continue
-        success = send_email_notification(member, member.pin, subject_override=subject, body_override=body)
+        success = send_email_notification(member, None, subject_override=subject, body_override=body)
         if success:
             count += 1
             

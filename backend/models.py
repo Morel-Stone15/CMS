@@ -62,6 +62,8 @@ class Attendance(db.Model):
         return {
             'id': self.id,
             'member_id': self.member_id,
+            'member_name': f"{self.member.first_name} {self.member.last_name}" if self.member else 'Inconnu',
+            'member_number': self.member.member_number if self.member else '',
             'event_id': self.event_id,
             'event_name': self.event_name,
             'scanned_at': self.scanned_at.isoformat() if self.scanned_at else None

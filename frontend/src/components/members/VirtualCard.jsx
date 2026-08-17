@@ -1,21 +1,30 @@
 import { useRef } from 'react';
+import { API_BASE } from '../../services/api';
+
+export function getMediaUrl(path) {
+  if (!path) return null;
+  if (path.startsWith('http://') || path.startsWith('https://')) return path;
+  const backendDomain = API_BASE.replace(/\/api\/?$/, '');
+  const cleanPath = path.startsWith('/') ? path : `/${path}`;
+  return `${backendDomain}${cleanPath}`;
+}
 
 export function VirtualCard({ member, cardRef }) {
   const wrapRef = useRef(null);
   const glareRef = useRef(null);
 
-  function handleMouseMove(e) {
+  function updateTilt(clientX, clientY) {
     const card = wrapRef.current;
     if (!card) return;
     const rect = card.getBoundingClientRect();
     const cx = rect.left + rect.width / 2;
     const cy = rect.top + rect.height / 2;
-    const dx = e.clientX - cx;
-    const dy = e.clientY - cy;
+    const dx = clientX - cx;
+    const dy = clientY - cy;
 
-    const rotY = (dx / (rect.width / 2)) * 15;
-    const rotX = -(dy / (rect.height / 2)) * 15;
-    card.style.transform = `rotateX(${rotX}deg) rotateY(${rotY}deg) scale(1.03)`;
+    const rotY = (dx / (rect.width / 2)) * 14;
+    const rotX = -(dy / (rect.height / 2)) * 14;
+    card.style.transform = `rotateX(${rotX}deg) rotateY(${rotY}deg) scale(1.02)`;
     card.style.boxShadow = `
       ${-rotY * 1.5}px ${rotX * 1.5}px 60px rgba(0,0,0,0.7),
       0 0 0 1px rgba(255,255,255,0.05),
@@ -25,19 +34,32 @@ export function VirtualCard({ member, cardRef }) {
     `;
 
     if (glareRef.current) {
-      const mx = ((e.clientX - rect.left) / rect.width) * 100;
-      const my = ((e.clientY - rect.top) / rect.height) * 100;
+      const mx = ((clientX - rect.left) / rect.width) * 100;
+      const my = ((clientY - rect.top) / rect.height) * 100;
       glareRef.current.style.setProperty('--mx', `${mx}%`);
       glareRef.current.style.setProperty('--my', `${my}%`);
     }
   }
 
-  function handleMouseLeave() {
+  function handleMouseMove(e) {
+    updateTilt(e.clientX, e.clientY);
+  }
+
+  function handleTouchMove(e) {
+    if (e.touches && e.touches[0]) {
+      updateTilt(e.touches[0].clientX, e.touches[0].clientY);
+    }
+  }
+
+  function resetTilt() {
     const card = wrapRef.current;
     if (!card) return;
     card.style.transform = 'rotateX(0deg) rotateY(0deg) scale(1)';
     card.style.boxShadow = '';
   }
+
+  const photoUrl = getMediaUrl(member?.photo_path);
+  const qrUrl = getMediaUrl(member?.qr_code_path);
 
   return (
     <div
@@ -45,7 +67,9 @@ export function VirtualCard({ member, cardRef }) {
       ref={el => { wrapRef.current = el; if (cardRef) cardRef.current = el; }}
       id="virtual-card"
       onMouseMove={handleMouseMove}
-      onMouseLeave={handleMouseLeave}
+      onMouseLeave={resetTilt}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={resetTilt}
     >
       <div className="card-particles">
         {[...Array(6)].map((_, i) => <div key={i} className="card-particle" />)}
@@ -69,9 +93,9 @@ export function VirtualCard({ member, cardRef }) {
         </div>
       </div>
 
-      {member?.photo_path && (
+      {photoUrl && (
         <div className="card-photo-circle">
-          <img src={`/${member.photo_path}`} alt="" />
+          <img src={photoUrl} alt="" />
         </div>
       )}
 
@@ -83,8 +107,8 @@ export function VirtualCard({ member, cardRef }) {
       </div>
 
       <div className="card-qr-area">
-        {member?.qr_code_path
-          ? <img src={`/${member.qr_code_path}`} alt="QR" />
+        {qrUrl
+          ? <img src={qrUrl} alt="QR" />
           : <div style={{ fontSize: 9, color: '#999', textAlign: 'center' }}>QR Code</div>}
       </div>
     </div>
