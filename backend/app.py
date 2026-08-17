@@ -84,6 +84,10 @@ def run_migrations():
                 cursor.execute("ALTER TABLE internal_discussion ADD COLUMN attachment_type VARCHAR(20)")
             if 'attachment_name' not in cols:
                 cursor.execute("ALTER TABLE internal_discussion ADD COLUMN attachment_name VARCHAR(255)")
+            if 'receiver_id' not in cols:
+                cursor.execute("ALTER TABLE internal_discussion ADD COLUMN receiver_id INTEGER")
+            if 'group_id' not in cols:
+                cursor.execute("ALTER TABLE internal_discussion ADD COLUMN group_id INTEGER")
             conn.commit()
         conn.close()
 

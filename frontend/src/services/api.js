@@ -71,7 +71,7 @@ export const api = {
   removeMemberFromCommission: (commId, memberId, operator = 'Bureau') => apiFetch(`/commissions/${commId}/members/${memberId}?operator=${encodeURIComponent(operator)}`, { method: 'DELETE' }),
 
   // Discussion & Communication
-  getDiscussion: () => apiFetch('/discussion'),
+  getDiscussion: (params = '') => apiFetch(`/discussion${params}`),
   postDiscussion: (data) => {
     if (data instanceof FormData) {
       return fetch(`${API_BASE}/discussion`, { method: 'POST', body: data }).then(r => r.json());
@@ -79,6 +79,15 @@ export const api = {
     return apiFetch('/discussion', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
   },
   deleteDiscussionMessage: (id) => apiFetch(`/discussion/${id}`, { method: 'DELETE' }),
+  getChatGroups: () => apiFetch('/discussion/groups'),
+  createChatGroup: (data) => apiFetch('/discussion/groups', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) }),
+  getStatuses: () => apiFetch('/discussion/statuses'),
+  postStatus: (data) => {
+    if (data instanceof FormData) {
+      return fetch(`${API_BASE}/discussion/statuses`, { method: 'POST', body: data }).then(r => r.json());
+    }
+    return apiFetch('/discussion/statuses', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
+  },
   sendMassEmail: (data) => apiFetch('/send_mass_email', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) }),
 
   // Calendar

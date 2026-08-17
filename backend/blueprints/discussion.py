@@ -1,7 +1,8 @@
 import os
 import uuid
+from datetime import datetime, timedelta
 from flask import Blueprint, request, jsonify, current_app
-from models import db, Member, InternalDiscussion
+from models import db, Member, InternalDiscussion, ChatGroup, ChatGroupMember, UserStatus
 from services.email_service import send_email_notification, log_action
 
 discussion_bp = Blueprint('discussion', __name__)
@@ -20,21 +21,46 @@ def detect_attachment_type(filename):
             return atype
     return 'document'
 
+# ── MESSAGES (Général, Groupe ou Direct 1-sur-1) ──
 @discussion_bp.route('/api/discussion', methods=['GET'])
 def get_discussion():
-    messages = InternalDiscussion.query.order_by(InternalDiscussion.sent_at.asc()).all()
+    group_id = request.args.get('group_id')
+    receiver_id = request.args.get('receiver_id')
+    member_id = request.args.get('member_id')
+
+    query = InternalDiscussion.query
+
+    if group_id:
+        query = query.filter_by(group_id=int(group_id))
+    elif receiver_id and member_id:
+        # Direct messaging 1-on-1 between member_id and receiver_id
+        mid = int(member_id)
+        rid = int(receiver_id)
+        query = query.filter(
+            ((InternalDiscussion.member_id == mid) & (InternalDiscussion.receiver_id == rid)) |
+            ((InternalDiscussion.member_id == rid) & (InternalDiscussion.receiver_id == mid))
+        )
+    else:
+        # General channel (group_id is None and receiver_id is None)
+        query = query.filter(InternalDiscussion.group_id.is_(None), InternalDiscussion.receiver_id.is_(None))
+
+    messages = query.order_by(InternalDiscussion.sent_at.asc()).all()
     return jsonify([m.to_dict() for m in messages]), 200
 
 @discussion_bp.route('/api/discussion', methods=['POST'])
 def post_discussion_message():
     if request.content_type and 'multipart/form-data' in request.content_type:
         member_id = request.form.get('member_id')
+        receiver_id = request.form.get('receiver_id')
+        group_id = request.form.get('group_id')
         message = request.form.get('message', '').strip()
         attachment_type_hint = request.form.get('attachment_type', '')
         file = request.files.get('file')
     else:
         data = request.json or {}
         member_id = data.get('member_id')
+        receiver_id = data.get('receiver_id')
+        group_id = data.get('group_id')
         message = (data.get('message') or '').strip()
         file = None
         attachment_type_hint = ''
@@ -67,6 +93,8 @@ def post_discussion_message():
     try:
         new_msg = InternalDiscussion(
             member_id=int(member_id),
+            receiver_id=int(receiver_id) if receiver_id else None,
+            group_id=int(group_id) if group_id else None,
             message=message or None,
             attachment_path=attachment_path,
             attachment_type=attachment_type,
@@ -77,7 +105,7 @@ def post_discussion_message():
         return jsonify(new_msg.to_dict()), 201
     except Exception as e:
         db.session.rollback()
-        return jsonify({'error': f'Erreur lors du post de la discussion: {str(e)}'}), 500
+        return jsonify({'error': f'Erreur lors du post: {str(e)}'}), 500
 
 @discussion_bp.route('/api/discussion/<int:msg_id>', methods=['DELETE'])
 def delete_discussion_message(msg_id):
@@ -90,6 +118,103 @@ def delete_discussion_message(msg_id):
     db.session.commit()
     return jsonify({'message': 'Message supprimé.'}), 200
 
+# ── GROUPES DE DISCUSSION ──
+@discussion_bp.route('/api/discussion/groups', methods=['GET'])
+def get_groups():
+    groups = ChatGroup.query.order_by(ChatGroup.created_at.desc()).all()
+    return jsonify([g.to_dict() for g in groups]), 200
+
+@discussion_bp.route('/api/discussion/groups', methods=['POST'])
+def create_group():
+    data = request.json or {}
+    name = (data.get('name') or '').strip()
+    description = (data.get('description') or '').strip()
+    created_by_id = data.get('created_by_id')
+    member_ids = data.get('member_ids', [])
+
+    if not name:
+        return jsonify({'error': 'Le nom du groupe est obligatoire.'}), 400
+
+    try:
+        group = ChatGroup(
+            name=name,
+            description=description,
+            created_by_id=created_by_id
+        )
+        db.session.add(group)
+        db.session.commit()
+
+        # Add members to group
+        all_members = set(member_ids)
+        if created_by_id:
+            all_members.add(created_by_id)
+
+        for mid in all_members:
+            m_link = ChatGroupMember(group_id=group.id, member_id=mid)
+            db.session.add(m_link)
+        db.session.commit()
+
+        log_action("Système", f"Création du groupe de discussion: {name}")
+        return jsonify(group.to_dict()), 201
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': f'Erreur création groupe: {str(e)}'}), 500
+
+# ── STATUTS WHATSAPP (Stories 24h) ──
+@discussion_bp.route('/api/discussion/statuses', methods=['GET'])
+def get_statuses():
+    since = datetime.utcnow() - timedelta(hours=24)
+    statuses = UserStatus.query.filter(UserStatus.created_at >= since).order_by(UserStatus.created_at.desc()).all()
+    return jsonify([s.to_dict() for s in statuses]), 200
+
+@discussion_bp.route('/api/discussion/statuses', methods=['POST'])
+def post_status():
+    if request.content_type and 'multipart/form-data' in request.content_type:
+        member_id = request.form.get('member_id')
+        content = request.form.get('content', '').strip()
+        bg_color = request.form.get('bg_color', '#6366f1')
+        file = request.files.get('file')
+    else:
+        data = request.json or {}
+        member_id = data.get('member_id')
+        content = (data.get('content') or '').strip()
+        bg_color = data.get('bg_color', '#6366f1')
+        file = None
+
+    if not member_id:
+        return jsonify({'error': 'member_id requis.'}), 400
+    if not content and not file:
+        return jsonify({'error': 'Contenu du statut requis.'}), 400
+
+    media_path = None
+    media_type = 'text'
+
+    if file and file.filename:
+        media_type = detect_attachment_type(file.filename)
+        status_folder = os.path.join(current_app.config['UPLOAD_FOLDER'], 'statuses')
+        os.makedirs(status_folder, exist_ok=True)
+        ext = file.filename.rsplit('.', 1)[-1].lower() if '.' in file.filename else 'bin'
+        safe_name = f"{uuid.uuid4().hex}.{ext}"
+        save_path = os.path.join(status_folder, safe_name)
+        file.save(save_path)
+        media_path = f"uploads/statuses/{safe_name}"
+
+    try:
+        new_status = UserStatus(
+            member_id=int(member_id),
+            content=content or None,
+            media_path=media_path,
+            media_type=media_type,
+            bg_color=bg_color
+        )
+        db.session.add(new_status)
+        db.session.commit()
+        return jsonify(new_status.to_dict()), 201
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': f'Erreur publication statut: {str(e)}'}), 500
+
+# ── EMAIL GROUPÉ ──
 @discussion_bp.route('/api/send_mass_email', methods=['POST'])
 def send_mass_email():
     data = request.json or {}

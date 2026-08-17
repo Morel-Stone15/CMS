@@ -129,26 +129,102 @@ class CommissionMember(db.Model):
             'member_id': self.member_id
         }
 
+class ChatGroup(db.Model):
+    __tablename__ = 'chat_groups'
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(120), nullable=False)
+    description = db.Column(db.Text, nullable=True)
+    icon_path = db.Column(db.String(255), nullable=True)
+    created_by_id = db.Column(db.Integer, db.ForeignKey('members.id', ondelete='SET NULL'), nullable=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    memberships = db.relationship('ChatGroupMember', backref='group', cascade='all, delete-orphan')
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'description': self.description,
+            'icon_path': self.icon_path,
+            'created_by_id': self.created_by_id,
+            'member_count': len(self.memberships),
+            'created_at': self.created_at.isoformat() if self.created_at else None
+        }
+
+class ChatGroupMember(db.Model):
+    __tablename__ = 'chat_group_members'
+    id = db.Column(db.Integer, primary_key=True)
+    group_id = db.Column(db.Integer, db.ForeignKey('chat_groups.id', ondelete='CASCADE'), nullable=False)
+    member_id = db.Column(db.Integer, db.ForeignKey('members.id', ondelete='CASCADE'), nullable=False)
+    joined_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    member = db.relationship('Member')
+
+    def to_dict(self):
+        m = self.member
+        return {
+            'id': self.id,
+            'group_id': self.group_id,
+            'member_id': self.member_id,
+            'member_name': f"{m.first_name} {m.last_name}" if m else "Membre",
+            'member_photo': m.photo_path if m else None,
+            'member_number': m.member_number if m else '',
+            'joined_at': self.joined_at.isoformat() if self.joined_at else None
+        }
+
+class UserStatus(db.Model):
+    __tablename__ = 'user_statuses'
+    id = db.Column(db.Integer, primary_key=True)
+    member_id = db.Column(db.Integer, db.ForeignKey('members.id', ondelete='CASCADE'), nullable=False)
+    content = db.Column(db.Text, nullable=True)
+    media_path = db.Column(db.String(500), nullable=True)
+    media_type = db.Column(db.String(20), default='text')  # text, photo, video
+    bg_color = db.Column(db.String(30), default='#6366f1')
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    member = db.relationship('Member')
+
+    def to_dict(self):
+        m = self.member
+        return {
+            'id': self.id,
+            'member_id': self.member_id,
+            'member_name': f"{m.first_name} {m.last_name}" if m else "Membre",
+            'member_photo': m.photo_path if m else None,
+            'member_number': m.member_number if m else '',
+            'content': self.content,
+            'media_path': self.media_path,
+            'media_type': self.media_type,
+            'bg_color': self.bg_color,
+            'created_at': self.created_at.isoformat() if self.created_at else None
+        }
+
 class InternalDiscussion(db.Model):
     __tablename__ = 'internal_discussion'
     id = db.Column(db.Integer, primary_key=True)
     member_id = db.Column(db.Integer, db.ForeignKey('members.id', ondelete='CASCADE'), nullable=False)
-    message = db.Column(db.Text, nullable=True)  # nullable: can be attachment-only
-    attachment_path = db.Column(db.String(500), nullable=True)    # relative path to uploaded file
-    attachment_type = db.Column(db.String(20), nullable=True)     # photo, video, document, voice
-    attachment_name = db.Column(db.String(255), nullable=True)    # original filename
+    receiver_id = db.Column(db.Integer, db.ForeignKey('members.id', ondelete='SET NULL'), nullable=True)
+    group_id = db.Column(db.Integer, db.ForeignKey('chat_groups.id', ondelete='CASCADE'), nullable=True)
+    message = db.Column(db.Text, nullable=True)
+    attachment_path = db.Column(db.String(500), nullable=True)
+    attachment_type = db.Column(db.String(20), nullable=True)
+    attachment_name = db.Column(db.String(255), nullable=True)
     sent_at = db.Column(db.DateTime, default=datetime.utcnow)
 
-    # Relationship to get sender name easily
-    member = db.relationship('Member')
+    member = db.relationship('Member', foreign_keys=[member_id])
+    receiver = db.relationship('Member', foreign_keys=[receiver_id])
 
     def to_dict(self):
-        m = Member.query.get(self.member_id) if self.member_id else None
+        m = self.member
+        rec = self.receiver
         return {
             'id': self.id,
             'member_id': self.member_id,
-            'sender_name': f"{m.first_name} {m.last_name}" if m else "Unknown Member",
+            'receiver_id': self.receiver_id,
+            'group_id': self.group_id,
+            'sender_name': f"{m.first_name} {m.last_name}" if m else "Membre Inconnu",
             'sender_photo': m.photo_path if m else None,
+            'receiver_name': f"{rec.first_name} {rec.last_name}" if rec else None,
             'message': self.message,
             'attachment_path': self.attachment_path,
             'attachment_type': self.attachment_type,
