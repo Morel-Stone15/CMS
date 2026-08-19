@@ -35,4 +35,4 @@ services:
     staticPublishPath: dist
     envVars:
       - key: VITE_API_URL
-        value: https://cms-fbf7.onrender.com/api
+        value: https://aurora-6gvs.onrender.com/api

@@ -1,4 +1,4 @@
-const RENDER_BACKEND_URL = 'https://cms-fbf7.onrender.com/api';
+const RENDER_BACKEND_URL = 'https://aurora-6gvs.onrender.com/api';
 
 function getApiBase() {
   const envUrl = import.meta.env.VITE_API_URL;
